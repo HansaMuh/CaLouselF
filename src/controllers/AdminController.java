@@ -2,7 +2,7 @@ package controllers;
 
 //File: controllers/AdminController.java
 
-import models.Database;
+import singleton.Database;
 import models.Item;
 import views.AdminView;
 import javafx.collections.FXCollections;
@@ -42,7 +42,7 @@ public class AdminController {
          while (rs.next()) {
              Item item = new Item();
              item.setId(rs.getInt("id"));
-             item.setItemName(rs.getString("item_name"));
+             item.setName(rs.getString("item_name"));
              item.setCategory(rs.getString("category"));
              item.setSize(rs.getString("size"));
              item.setPrice(rs.getDouble("price"));

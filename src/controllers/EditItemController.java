@@ -2,7 +2,7 @@ package controllers;
 
 //File: controllers/EditItemController.java
 
-import models.Database;
+import singleton.Database;
 import models.Item;
 import views.EditItemView;
 import javafx.scene.control.Alert;
@@ -71,7 +71,7 @@ public class EditItemController {
      }
 
      // Update objek Item
-     item.setItemName(itemName);
+     item.setName(itemName);
      item.setCategory(category);
      item.setSize(size);
      item.setPrice(price);
@@ -91,7 +91,7 @@ public class EditItemController {
      String update = "UPDATE items SET item_name = ?, category = ?, size = ?, price = ?, status = ? WHERE id = ?";
      try (Connection conn = Database.getConnection();
           PreparedStatement stmt = conn.prepareStatement(update)) {
-         stmt.setString(1, item.getItemName());
+         stmt.setString(1, item.getName());
          stmt.setString(2, item.getCategory());
          stmt.setString(3, item.getSize());
          stmt.setDouble(4, item.getPrice());

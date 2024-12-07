@@ -5,7 +5,7 @@ package models;
 
 public class Item {
  private int id;
- private String itemName;
+ private String name;
  private String category;
  private String size;
  private double price;
@@ -15,8 +15,8 @@ public class Item {
  // Constructors
  public Item() {}
 
- public Item(String itemName, String category, String size, double price, int sellerId) {
-     this.itemName = itemName;
+ public Item(String name, String category, String size, double price, int sellerId) {
+     this.name = name;
      this.category = category;
      this.size = size;
      this.price = price;
@@ -28,8 +28,8 @@ public class Item {
  public int getId() { return id; }
  public void setId(int id) { this.id = id; }
 
- public String getItemName() { return itemName; }
- public void setItemName(String itemName) { this.itemName = itemName; }
+ public String getName() { return name; }
+ public void setName(String name) { this.name = name; }
 
  public String getCategory() { return category; }
  public void setCategory(String category) { this.category = category; }

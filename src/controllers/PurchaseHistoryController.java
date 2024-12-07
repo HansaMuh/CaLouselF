@@ -2,13 +2,12 @@ package controllers;
 
 //File: controllers/PurchaseHistoryController.java
 
-import models.Database;
+import singleton.Database;
 import models.Transaction;
 import views.PurchaseHistoryView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
-import javafx.scene.control.TableView;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

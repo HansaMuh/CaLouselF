@@ -2,13 +2,12 @@ package controllers;
 
 //File: controllers/BuyerController.java
 
-import models.Database;
+import singleton.Database;
 import models.Item;
 import views.BuyerView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
-import javafx.scene.control.TableView;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -54,7 +53,7 @@ public class BuyerController {
          while (rs.next()) {
              Item item = new Item();
              item.setId(rs.getInt("id"));
-             item.setItemName(rs.getString("item_name"));
+             item.setName(rs.getString("item_name"));
              item.setCategory(rs.getString("category"));
              item.setSize(rs.getString("size"));
              item.setPrice(rs.getDouble("price"));

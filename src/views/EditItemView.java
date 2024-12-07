@@ -32,7 +32,7 @@ public class EditItemView {
      grid.setHgap(10);
 
      Label itemNameLabel = new Label("Item Name:");
-     itemNameField = new TextField(item.getItemName());
+     itemNameField = new TextField(item.getName());
 
      Label categoryLabel = new Label("Category:");
      categoryField = new TextField(item.getCategory());

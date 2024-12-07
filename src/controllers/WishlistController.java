@@ -2,9 +2,8 @@ package controllers;
 
 //File: controllers/WishlistController.java
 
-import models.Database;
+import singleton.Database;
 import models.Item;
-import models.Wishlist;
 import views.WishlistView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -43,7 +42,7 @@ public class WishlistController {
          while (rs.next()) {
              Item item = new Item();
              item.setId(rs.getInt("id"));
-             item.setItemName(rs.getString("item_name"));
+             item.setName(rs.getString("item_name"));
              item.setCategory(rs.getString("category"));
              item.setSize(rs.getString("size"));
              item.setPrice(rs.getDouble("price"));

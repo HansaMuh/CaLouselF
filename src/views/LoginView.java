@@ -1,52 +1,109 @@
 package views;
 
-//File: views/LoginView.java
-
+import controllers.UserController;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import view_controllers.MainViewController;
 
-public class LoginView {
- private VBox view;
- private TextField usernameField;
- private PasswordField passwordField;
- private Button loginButton;
+public class LoginView extends VBox implements EventHandler<ActionEvent> {
 
- public LoginView() {
-     view = new VBox();
-     view.setPadding(new Insets(20));
-     view.setSpacing(10);
+    // Constructor
 
-     Label title = new Label("Login");
-     title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+    public LoginView() {
+        init();
+        setLayout();
+    }
 
-     GridPane grid = new GridPane();
-     grid.setVgap(10);
-     grid.setHgap(10);
+    // Properties
 
-     Label usernameLabel = new Label("Username:");
-     usernameField = new TextField();
+    // private LoginController controller;
 
-     Label passwordLabel = new Label("Password:");
-     passwordField = new PasswordField();
+    private Label titleLabel;
+    private Label captionLabel;
 
-     grid.add(usernameLabel, 0, 0);
-     grid.add(usernameField, 1, 0);
-     grid.add(passwordLabel, 0, 1);
-     grid.add(passwordField, 1, 1);
+    private GridPane formGrid;
+    private GridPane buttonGrid;
 
-     loginButton = new Button("Login");
+    private Label usernameLabel;
+    private TextField usernameField;
 
-     view.getChildren().addAll(title, grid, loginButton);
- }
+    private Label passwordLabel;
+    private PasswordField passwordField;
 
- public VBox getView() {
-     return view;
- }
+    private Button loginButton;
+    private Button navigateToRegisterButton;
 
- public TextField getUsernameField() { return usernameField; }
- public PasswordField getPasswordField() { return passwordField; }
- public Button getLoginButton() { return loginButton; }
+    // Methods
+
+    private void init() {
+        titleLabel = new Label("Log in");
+        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        captionLabel = new Label("Please log in to access the rest of the application.");
+        captionLabel.setStyle("-fx-font-size: 14px;");
+
+        formGrid = new GridPane();
+        buttonGrid = new GridPane();
+
+        usernameLabel = new Label("Username");
+        usernameField = new TextField();
+
+        passwordLabel = new Label("Password");
+        passwordField = new PasswordField();
+
+        loginButton = new Button("Log in");
+        loginButton.setOnAction(this);
+
+        navigateToRegisterButton = new Button("Register Account");
+        navigateToRegisterButton.setOnAction(this);
+    }
+
+    private void setLayout() {
+        this.setPadding(new Insets(10, 15, 10, 15));
+        this.setSpacing(15);
+
+        formGrid.setVgap(10);
+        formGrid.setHgap(10);
+        formGrid.setPadding(new Insets(5, 0, 5, 0));
+
+        formGrid.add(usernameLabel, 0, 0);
+        formGrid.add(usernameField, 1, 0);
+        formGrid.add(passwordLabel, 0, 1);
+        formGrid.add(passwordField, 1, 1);
+
+        buttonGrid.setHgap(10);
+        buttonGrid.setVgap(10);
+
+        buttonGrid.add(loginButton, 0, 0);
+        buttonGrid.add(navigateToRegisterButton, 1, 0);
+
+        this.getChildren().addAll(titleLabel, captionLabel, formGrid, buttonGrid);
+    }
+
+    // Overrides
+
+    @Override
+    public void handle(ActionEvent evt)
+    {
+        if (evt.getSource() == loginButton)
+        {
+            String loginUsername = usernameField.getText();
+            String loginPassword = passwordField.getText();
+
+            UserController.login(loginUsername, loginPassword);
+        }
+        else if (evt.getSource() == navigateToRegisterButton)
+        {
+            MainViewController.getInstance(null).navigateToRegister();
+        }
+    }
+
 }
 
