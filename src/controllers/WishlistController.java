@@ -40,14 +40,14 @@ public class WishlistController {
          stmt.setInt(1, userId);
          ResultSet rs = stmt.executeQuery();
          while (rs.next()) {
-             Item item = new Item();
-             item.setId(rs.getInt("id"));
-             item.setName(rs.getString("item_name"));
-             item.setCategory(rs.getString("category"));
-             item.setSize(rs.getString("size"));
-             item.setPrice(rs.getDouble("price"));
-             item.setStatus(rs.getString("status"));
-             items.add(item);
+//             Item item = new Item();
+//             item.setId(rs.getInt("id"));
+//             item.setName(rs.getString("item_name"));
+//             item.setCategory(rs.getString("category"));
+//             item.setSize(rs.getString("size"));
+//             item.setPrice(rs.getDouble("price"));
+//             item.setStatus(rs.getString("status"));
+//             items.add(item);
          }
          view.getTableView().setItems(items);
      } catch (SQLException e) {
@@ -67,7 +67,7 @@ public class WishlistController {
      try (Connection conn = Database.getConnection();
           PreparedStatement stmt = conn.prepareStatement(delete)) {
          stmt.setInt(1, userId);
-         stmt.setInt(2, selectedItem.getId());
+//         stmt.setInt(2, selectedItem.getId());
          int rows = stmt.executeUpdate();
          if (rows > 0) {
              showAlert("Success", "Item removed from wishlist.");

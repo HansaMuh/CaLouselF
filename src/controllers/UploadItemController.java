@@ -71,15 +71,15 @@ public class UploadItemController {
      }
 
      // Membuat objek Item
-     Item item = new Item(itemName, category, size, price, sellerId);
-
-     // Menyimpan item ke database
-     if (saveItem(item)) {
-         showAlert("Success", "Item uploaded successfully and is pending approval.");
-         clearFields();
-     } else {
-         showAlert("Error", "Failed to upload item. Please try again.");
-     }
+//     Item item = new Item(itemName, category, size, price, sellerId);
+//
+//     // Menyimpan item ke database
+//     if (saveItem(item)) {
+//         showAlert("Success", "Item uploaded successfully and is pending approval.");
+//         clearFields();
+//     } else {
+//         showAlert("Error", "Failed to upload item. Please try again.");
+//     }
  }
 
  private boolean saveItem(Item item) {
@@ -90,7 +90,7 @@ public class UploadItemController {
          stmt.setString(2, item.getCategory());
          stmt.setString(3, item.getSize());
          stmt.setDouble(4, item.getPrice());
-         stmt.setInt(5, item.getSellerId());
+         //stmt.setInt(5, item.getSellerId());
          int rows = stmt.executeUpdate();
          return rows > 0;
      } catch (SQLException e) {

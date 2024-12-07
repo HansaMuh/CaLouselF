@@ -1,27 +1,41 @@
 package models;
 
-//File: models/Wishlist.java
+import java.util.Date;
 
 public class Wishlist {
- private int id;
- private int userId;
- private int itemId;
 
- // Constructors
- public Wishlist() {}
+    // Constructor
 
- public Wishlist(int userId, int itemId) {
-     this.userId = userId;
-     this.itemId = itemId;
- }
+    public Wishlist(String id, String itemId, String userId, Date date) {
+        this.id = id;
+        this.itemId = itemId;
+        this.userId = userId;
+        this.date = date;
+    }
 
- // Getters and Setters
- public int getId() { return id; }
- public void setId(int id) { this.id = id; }
+    // Properties
 
- public int getUserId() { return userId; }
- public void setUserId(int userId) { this.userId = userId; }
+    private String id;
+    private String itemId;
+    private String userId;
+    private Date date;
 
- public int getItemId() { return itemId; }
- public void setItemId(int itemId) { this.itemId = itemId; }
+    // Getters
+
+    public String getId() {
+        return id;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
 }

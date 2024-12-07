@@ -73,6 +73,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        primaryStage.setTitle("CaLouselF");
 
         MainViewController viewController = MainViewController.getInstance(primaryStage);
         viewController.navigateToLogin();

@@ -44,7 +44,7 @@ public class MainView {
         topLevelBorder.setLeft(backButton);
     }
 
-    private void setTopLevelBorder(boolean isActive) {
+    public void setTopLevelBorder(boolean isActive) {
         if (isActive) {
             viewBorder.setTop(topLevelBorder);
             BorderPane.setMargin(topLevelBorder, new Insets(10, 15, 10, 15));

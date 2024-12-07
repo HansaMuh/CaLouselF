@@ -1,49 +1,60 @@
 package models;
 
-//File: models/Item.java
-
+import enums.ItemStatus;
 
 public class Item {
- private int id;
- private String name;
- private String category;
- private String size;
- private double price;
- private int sellerId;
- private String status;
 
- // Constructors
- public Item() {}
+    // Constructor
 
- public Item(String name, String category, String size, double price, int sellerId) {
-     this.name = name;
-     this.category = category;
-     this.size = size;
-     this.price = price;
-     this.sellerId = sellerId;
-     this.status = "Pending";
- }
+    public Item(String id, String sellerId, String name, String size, double price, String category, ItemStatus status)
+    {
+        this.id = id;
+        this.sellerId = sellerId;
+        this.name = name;
+        this.size = size;
+        this.price = price;
+        this.category = category;
+        this.status = status;
+    }
 
- // Getters and Setters
- public int getId() { return id; }
- public void setId(int id) { this.id = id; }
+    // Properties
 
- public String getName() { return name; }
- public void setName(String name) { this.name = name; }
+    private String id;
+    private String sellerId;
+    private String name;
+    private String size;
+    private double price;
+    private String category;
+    private ItemStatus status;
 
- public String getCategory() { return category; }
- public void setCategory(String category) { this.category = category; }
+    // Getters
 
- public String getSize() { return size; }
- public void setSize(String size) { this.size = size; }
+    public String getId() {
+        return id;
+    }
 
- public double getPrice() { return price; }
- public void setPrice(double price) { this.price = price; }
+    public String getSellerId() {
+        return sellerId;
+    }
 
- public int getSellerId() { return sellerId; }
- public void setSellerId(int sellerId) { this.sellerId = sellerId; }
+    public String getName() {
+        return name;
+    }
 
- public String getStatus() { return status; }
- public void setStatus(String status) { this.status = status; }
+    public String getSize() {
+        return size;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public ItemStatus getStatus() {
+        return status;
+    }
+
 }
-

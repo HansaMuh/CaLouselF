@@ -1,7 +1,9 @@
 package view_controllers;
 
+import javafx.scene.control.Alert;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import models.User;
 import views.LoginView;
 import views.MainView;
 import views.RegisterView;
@@ -51,30 +53,66 @@ public class MainViewController {
         return pages.size() > 1;
     }
 
-    // Methods
-
-    public void navigateBack() {
-        if (isViewMultilayered())
-        {
-            pages.pop();
-            mainView.getContainer().setCenter(pages.lastElement());
+    private void refreshStage() {
+        if (pages.lastElement() instanceof LoginView) {
+            stage.setTitle("Log in | CaLouselF");
+            stage.setWidth(450);
+            stage.setHeight(300);
+        } else if (pages.lastElement() instanceof RegisterView) {
+            stage.setTitle("Register account | CaLouselF");
+            stage.setWidth(450);
+            stage.setHeight(450);
+        } else {
+            stage.setTitle("CaLouselF");
+            stage.setWidth(800);
+            stage.setHeight(600);
         }
     }
 
-    public void navigateToLogin() {
-        stage.setTitle("Log in | CaLouselF");
-        stage.setWidth(450);
-        stage.setHeight(300);
+    public void showAlert(boolean isSuccess, String title, String message) {
+        Alert.AlertType alertType = isSuccess ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR;
 
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        alert.showAndWait();
+    }
+
+    // Methods
+
+    public void navigateBack() {
+        pages.pop();
+
+        mainView.getContainer().setCenter(pages.lastElement());
+        mainView.setTopLevelBorder(isViewMultilayered());
+        refreshStage();
+    }
+
+    public void navigateToLogin() {
         LoginView view = new LoginView();
         pages.add(view);
+
         mainView.getContainer().setCenter(view);
+        mainView.setTopLevelBorder(false);
+
+        refreshStage();
+        stage.centerOnScreen();
     }
 
     public void navigateToRegister() {
-//        RegisterView view = new RegisterView();
-//        pages.add(view);
-//        mainView.getContainer().setCenter(view);
+        RegisterView view = new RegisterView();
+        pages.add(view);
+
+        mainView.getContainer().setCenter(view);
+        mainView.setTopLevelBorder(true);
+
+        refreshStage();
+    }
+
+    public void navigateToHome(User user) {
+
     }
 
 }

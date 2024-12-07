@@ -39,14 +39,14 @@ public class PurchaseHistoryController {
          stmt.setInt(1, userId);
          ResultSet rs = stmt.executeQuery();
          while (rs.next()) {
-             Transaction transaction = new Transaction();
-             transaction.setId(rs.getInt("id"));
-             transaction.setTransactionDate(rs.getString("transaction_date"));
-             transaction.setItemName(rs.getString("item_name"));
-             transaction.setCategory(rs.getString("category"));
-             transaction.setSize(rs.getString("size"));
-             transaction.setPrice(rs.getDouble("price"));
-             transactions.add(transaction);
+//             Transaction transaction = new Transaction();
+//             transaction.setId(rs.getInt("id"));
+//             transaction.setTransactionDate(rs.getString("transaction_date"));
+//             transaction.setItemName(rs.getString("item_name"));
+//             transaction.setCategory(rs.getString("category"));
+//             transaction.setSize(rs.getString("size"));
+//             transaction.setPrice(rs.getDouble("price"));
+//             transactions.add(transaction);
          }
          view.getTableView().setItems(transactions);
      } catch (SQLException e) {

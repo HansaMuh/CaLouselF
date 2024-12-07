@@ -1,6 +1,7 @@
 package controllers;
 
-import models.Response;
+import enums.UserRole;
+import modules.Response;
 import models.User;
 import singleton.Database;
 
@@ -15,7 +16,7 @@ public class UserController {
         if (username.isEmpty() || password.isEmpty()) {
             return new Response<>(
                     false,
-                    "Login failed: Username and password cannot be empty.",
+                    "Login failed:\r\n- Username and password cannot be empty.",
                     null
             );
         }
@@ -38,7 +39,7 @@ public class UserController {
                         resultSet.getString("password"),
                         resultSet.getString("phone_number"),
                         resultSet.getString("address"),
-                        resultSet.getString("role")
+                        UserRole.valueOf(resultSet.getString("role"))
                 );
 
                 return new Response<>(
@@ -78,7 +79,8 @@ public class UserController {
         Response<Integer> userCountResponse = checkUserCount();
 
         String id = String.format("UID%04d", userCountResponse.getOutput() + 1); // e.g. UID0001
-        User user = new User(id, username, password, phoneNumber, address, role);
+        UserRole userRole = UserRole.valueOf(role);
+        User user = new User(id, username, password, phoneNumber, address, userRole);
 
         String query = "INSERT INTO users (id, username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?, ?);";
         try {
@@ -89,7 +91,7 @@ public class UserController {
             statement.setString(3, user.getPassword());
             statement.setString(4, user.getPhoneNumber());
             statement.setString(5, user.getAddress());
-            statement.setString(6, user.getRole());
+            statement.setString(6, user.getRole().toString());
 
             statement.execute();
         }
@@ -162,65 +164,21 @@ public class UserController {
         );
     }
 
-    // Helpers
-
-    private Response<User> authenticateUser(String username, String password) {
-        String query = "SELECT * FROM users WHERE username = ? AND password = ?;";
-        try {
-            PreparedStatement statement = Database.getInstance().prepareStatement(query);
-
-            statement.setString(1, username);
-            statement.setString(2, password);
-
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                User user = new User(
-                        resultSet.getString("id"),
-                        resultSet.getString("username"),
-                        resultSet.getString("password"),
-                        resultSet.getString("phone_number"),
-                        resultSet.getString("address"),
-                        resultSet.getString("role")
-                );
-
-                return new Response<>(
-                        true,
-                        "Authentication success.",
-                        user
-                );
-            }
-        }
-        catch (Exception ex) {
-            return new Response<>(
-                    false,
-                    "An error occurred while authenticating.",
-                    null
-            );
-        }
-
-        return new Response<>(
-                false,
-                "Invalid username or password.",
-                null
-        );
-    }
-
     // Validations
 
     private static String validateUsername(String username) {
         String errorMessage = "";
 
         if (username.isEmpty()) {
-            errorMessage += "Username cannot be empty.\r\n";
+            errorMessage += "- Username cannot be empty.\r\n";
         }
 
         if (username.length() < 3) {
-            errorMessage += "Username must be at least 3 characters long.\r\n";
+            errorMessage += "- Username must be at least 3 characters long.\r\n";
         }
 
         if (!isUsernameUnique(username)) {
-            errorMessage += "Username already exists.\r\n";
+            errorMessage += "- Username already exists.\r\n";
         }
 
         return errorMessage;
@@ -230,15 +188,15 @@ public class UserController {
         String errorMessage = "";
 
         if (password.isEmpty()) {
-            errorMessage += "Password cannot be empty.\r\n";
+            errorMessage += "- Password cannot be empty.\r\n";
         }
 
         if (password.length() < 8) {
-            errorMessage += "Password must be at least 8 characters long.\r\n";
+            errorMessage += "- Password must be at least 8 characters long.\r\n";
         }
 
         if (!containsSpecialCharacter(password)) {
-            errorMessage += "Password must include at least one special character (!, @, #, $, %, ^, &, *).\r\n";
+            errorMessage += "- Password must include at least one special character (!, @, #, $, %, ^, &, *).\r\n";
         }
 
         return errorMessage;
@@ -248,7 +206,7 @@ public class UserController {
         String errorMessage = "";
 
         if (!isValidPhoneNumber(phoneNumber)) {
-            errorMessage += "Phone number must start with +62 and be at least 10 characters long.\r\n";
+            errorMessage += "- Phone number must start with +62 and be at least 10 characters long.\r\n";
         }
 
         return errorMessage;
@@ -258,7 +216,7 @@ public class UserController {
         String errorMessage = "";
 
         if (address.isEmpty()) {
-            errorMessage += "Address cannot be empty.\r\n";
+            errorMessage += "- Address cannot be empty.\r\n";
         }
 
         return errorMessage;
@@ -268,7 +226,7 @@ public class UserController {
         String errorMessage = "";
 
         if (role == null || role.isEmpty()) {
-            errorMessage += "Role cannot be empty.\r\n";
+            errorMessage += "- Role cannot be empty.\r\n";
         }
 
         return errorMessage;

@@ -10,6 +10,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import models.User;
+import modules.Response;
 import view_controllers.MainViewController;
 
 public class LoginView extends VBox implements EventHandler<ActionEvent> {
@@ -23,7 +25,7 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
 
     // Properties
 
-    // private LoginController controller;
+    // private UserController controller;
 
     private Label titleLabel;
     private Label captionLabel;
@@ -66,8 +68,8 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setLayout() {
-        this.setPadding(new Insets(10, 15, 10, 15));
-        this.setSpacing(15);
+        setPadding(new Insets(10, 15, 10, 15));
+        setSpacing(15);
 
         formGrid.setVgap(10);
         formGrid.setHgap(10);
@@ -78,13 +80,18 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
         formGrid.add(passwordLabel, 0, 1);
         formGrid.add(passwordField, 1, 1);
 
+        usernameField.setPrefWidth(225);
+
         buttonGrid.setHgap(10);
         buttonGrid.setVgap(10);
 
         buttonGrid.add(loginButton, 0, 0);
         buttonGrid.add(navigateToRegisterButton, 1, 0);
 
-        this.getChildren().addAll(titleLabel, captionLabel, formGrid, buttonGrid);
+        loginButton.setPrefWidth(75);
+        navigateToRegisterButton.setPrefWidth(125);
+
+        getChildren().addAll(titleLabel, captionLabel, formGrid, buttonGrid);
     }
 
     // Overrides
@@ -97,7 +104,14 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
             String loginUsername = usernameField.getText();
             String loginPassword = passwordField.getText();
 
-            UserController.login(loginUsername, loginPassword);
+            Response<User> loginResponse = UserController.login(loginUsername, loginPassword);
+
+            MainViewController.getInstance(null).showAlert(loginResponse.getIsSuccess(),
+                    "Log in", loginResponse.getMessage());
+
+            if (loginResponse.getIsSuccess()) {
+                MainViewController.getInstance(null).navigateToHome(loginResponse.getOutput());
+            }
         }
         else if (evt.getSource() == navigateToRegisterButton)
         {

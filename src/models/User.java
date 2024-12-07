@@ -1,10 +1,12 @@
 package models;
 
+import enums.UserRole;
+
 public class User {
 
     // Constructor
 
-    public User(String id, String username, String password, String phoneNumber, String address, String role) {
+    public User(String id, String username, String password, String phoneNumber, String address, UserRole role) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -20,7 +22,7 @@ public class User {
     private String password;
     private String phoneNumber;
     private String address;
-    private String role;
+    private UserRole role;
 
     // Getters
 
@@ -44,7 +46,7 @@ public class User {
         return address;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 

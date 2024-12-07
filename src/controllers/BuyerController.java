@@ -51,14 +51,14 @@ public class BuyerController {
           PreparedStatement stmt = conn.prepareStatement(query)) {
          ResultSet rs = stmt.executeQuery();
          while (rs.next()) {
-             Item item = new Item();
-             item.setId(rs.getInt("id"));
-             item.setName(rs.getString("item_name"));
-             item.setCategory(rs.getString("category"));
-             item.setSize(rs.getString("size"));
-             item.setPrice(rs.getDouble("price"));
-             item.setStatus(rs.getString("status"));
-             items.add(item);
+//             Item item = new Item();
+//             item.setId(rs.getInt("id"));
+//             item.setName(rs.getString("item_name"));
+//             item.setCategory(rs.getString("category"));
+//             item.setSize(rs.getString("size"));
+//             item.setPrice(rs.getDouble("price"));
+//             item.setStatus(rs.getString("status"));
+//             items.add(item);
          }
          view.getTableView().setItems(items);
      } catch (SQLException e) {

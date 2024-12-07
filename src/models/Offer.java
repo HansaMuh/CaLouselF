@@ -1,36 +1,61 @@
 package models;
 
-//File: models/Offer.java
+import enums.OfferStatus;
+
+import java.util.Date;
 
 public class Offer {
- private int id;
- private int userId;
- private int itemId;
- private double offerPrice;
- private String offerDate;
 
- // Constructors
- public Offer() {}
+    // Constructor
 
- public Offer(int userId, int itemId, double offerPrice) {
-     this.userId = userId;
-     this.itemId = itemId;
-     this.offerPrice = offerPrice;
- }
+    public Offer(String id, String userId, String itemId, double price, Date date, OfferStatus status, String reason) {
+        this.id = id;
+        this.userId = userId;
+        this.itemId = itemId;
+        this.price = price;
+        this.date = date;
+        this.status = status;
+        this.reason = reason;
+    }
 
- // Getters and Setters
- public int getId() { return id; }
- public void setId(int id) { this.id = id; }
+    // Properties
 
- public int getUserId() { return userId; }
- public void setUserId(int userId) { this.userId = userId; }
+    private String id;
+    private String userId;
+    private String itemId;
+    private double price;
+    private Date date;
+    private OfferStatus status;
+    private String reason;
 
- public int getItemId() { return itemId; }
- public void setItemId(int itemId) { this.itemId = itemId; }
+    // Getters
 
- public double getOfferPrice() { return offerPrice; }
- public void setOfferPrice(double offerPrice) { this.offerPrice = offerPrice; }
+    public String getId() {
+        return id;
+    }
 
- public String getOfferDate() { return offerDate; }
- public void setOfferDate(String offerDate) { this.offerDate = offerDate; }
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public OfferStatus getStatus() {
+        return status;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
 }

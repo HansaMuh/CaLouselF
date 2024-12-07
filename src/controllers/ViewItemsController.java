@@ -45,14 +45,14 @@ public class ViewItemsController {
          stmt.setInt(1, sellerId);
          ResultSet rs = stmt.executeQuery();
          while (rs.next()) {
-             Item item = new Item();
-             item.setId(rs.getInt("id"));
-             item.setName(rs.getString("item_name"));
-             item.setCategory(rs.getString("category"));
-             item.setSize(rs.getString("size"));
-             item.setPrice(rs.getDouble("price"));
-             item.setStatus(rs.getString("status"));
-             items.add(item);
+//             Item item = new Item();
+//             item.setId(rs.getInt("id"));
+//             item.setName(rs.getString("item_name"));
+//             item.setCategory(rs.getString("category"));
+//             item.setSize(rs.getString("size"));
+//             item.setPrice(rs.getDouble("price"));
+//             item.setStatus(rs.getString("status"));
+//             items.add(item);
          }
          view.getTableView().setItems(items);
      } catch (SQLException e) {
@@ -100,14 +100,14 @@ public class ViewItemsController {
      confirm.setHeaderText(null);
      confirm.setContentText("Are you sure you want to delete the selected item?");
      confirm.showAndWait().ifPresent(response -> {
-         if (response == javafx.scene.control.ButtonType.OK) {
-             if (deleteItem(selectedItem.getId())) {
-                 showAlert("Success", "Item deleted successfully.");
-                 loadItems();
-             } else {
-                 showAlert("Error", "Failed to delete item.");
-             }
-         }
+//         if (response == javafx.scene.control.ButtonType.OK) {
+//             if (deleteItem(selectedItem.getId())) {
+//                 showAlert("Success", "Item deleted successfully.");
+//                 loadItems();
+//             } else {
+//                 showAlert("Error", "Failed to delete item.");
+//             }
+//         }
      });
  }
 

@@ -71,11 +71,11 @@ public class EditItemController {
      }
 
      // Update objek Item
-     item.setName(itemName);
-     item.setCategory(category);
-     item.setSize(size);
-     item.setPrice(price);
-     item.setStatus("Pending"); // Set status kembali ke pending setelah edit
+//     item.setName(itemName);
+//     item.setCategory(category);
+//     item.setSize(size);
+//     item.setPrice(price);
+//     item.setStatus("Pending"); // Set status kembali ke pending setelah edit
 
      // Simpan perubahan ke database
      if (updateItem(item)) {
@@ -95,8 +95,8 @@ public class EditItemController {
          stmt.setString(2, item.getCategory());
          stmt.setString(3, item.getSize());
          stmt.setDouble(4, item.getPrice());
-         stmt.setString(5, item.getStatus());
-         stmt.setInt(6, item.getId());
+//         stmt.setString(5, item.getStatus());
+//         stmt.setInt(6, item.getId());
          int rows = stmt.executeUpdate();
          return rows > 0;
      } catch (SQLException e) {

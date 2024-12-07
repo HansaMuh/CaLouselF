@@ -40,14 +40,14 @@ public class AdminController {
           PreparedStatement stmt = conn.prepareStatement(query)) {
          ResultSet rs = stmt.executeQuery();
          while (rs.next()) {
-             Item item = new Item();
-             item.setId(rs.getInt("id"));
-             item.setName(rs.getString("item_name"));
-             item.setCategory(rs.getString("category"));
-             item.setSize(rs.getString("size"));
-             item.setPrice(rs.getDouble("price"));
-             item.setStatus(rs.getString("status"));
-             items.add(item);
+//             Item item = new Item();
+//             item.setId(rs.getInt("id"));
+//             item.setName(rs.getString("item_name"));
+//             item.setCategory(rs.getString("category"));
+//             item.setSize(rs.getString("size"));
+//             item.setPrice(rs.getDouble("price"));
+//             item.setStatus(rs.getString("status"));
+//             items.add(item);
          }
          view.getTableView().setItems(items);
      } catch (SQLException e) {
@@ -66,7 +66,7 @@ public class AdminController {
      String update = "UPDATE items SET status = 'Approved', reason = NULL WHERE id = ?";
      try (Connection conn = Database.getConnection();
           PreparedStatement stmt = conn.prepareStatement(update)) {
-         stmt.setInt(1, selectedItem.getId());
+//         stmt.setInt(1, selectedItem.getId());
          int rows = stmt.executeUpdate();
          if (rows > 0) {
              showAlert("Success", "Item approved successfully.");
@@ -105,7 +105,7 @@ public class AdminController {
          try (Connection conn = Database.getConnection();
               PreparedStatement stmt = conn.prepareStatement(update)) {
              stmt.setString(1, reason);
-             stmt.setInt(2, selectedItem.getId());
+//             stmt.setInt(2, selectedItem.getId());
              int rows = stmt.executeUpdate();
              if (rows > 0) {
                  showAlert("Success", "Item declined successfully.");
