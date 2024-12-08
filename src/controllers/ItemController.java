@@ -37,7 +37,8 @@ public class ItemController {
                         resultSet.getString("size"),
                         resultSet.getDouble("price"),
                         resultSet.getString("category"),
-                        ItemStatus.valueOf(resultSet.getString("status"))
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
                 );
 
                 items.add(item);
@@ -82,7 +83,8 @@ public class ItemController {
                         resultSet.getString("size"),
                         resultSet.getDouble("price"),
                         resultSet.getString("category"),
-                        ItemStatus.valueOf(resultSet.getString("status"))
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
                 );
 
                 items.add(item);
@@ -103,4 +105,86 @@ public class ItemController {
                 items
         );
     }
+
+    // Designed for: Approve Item feature
+    // This method is used to approve an item that has been requested by a seller.
+    public static Response<Item> approveItem(String id) {
+        String query = "UPDATE items SET status = ? WHERE id = ?;";
+        String status = ItemStatus.APPROVED.toString();
+
+        try {
+            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+
+            statement.setString(1, status);
+            statement.setString(2, id);
+
+            statement.execute();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to approve item:\r\n- " + ex.getMessage(),
+                    null
+            );
+        }
+
+        return new Response<>(
+                true,
+                "Item approved successfully.",
+                null
+        );
+    }
+
+    public static Response<Item> declineItem(String id, String reason) {
+        String errorMessage = validateReason(reason);
+
+        if (!errorMessage.isEmpty()) {
+            return new Response<>(
+                    false,
+                    "Failed to decline item:\r\n" + errorMessage,
+                    null
+            );
+        }
+
+        String query = "UPDATE items SET status = ?, note = ? WHERE id = ?;";
+        String status = ItemStatus.DECLINED.toString();
+
+        try {
+            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+
+            statement.setString(1, status);
+            statement.setString(2, reason);
+            statement.setString(3, id);
+
+            statement.execute();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to decline item:\r\n- " + ex.getMessage(),
+                    null
+            );
+        }
+
+        return new Response<>(
+                true,
+                "Item declined successfully.",
+                null
+        );
+    }
+
+    // Validations
+
+    private static String validateReason(String reason) {
+        String errorMessage = "";
+
+        if (reason.isEmpty()) {
+            errorMessage += "- Reason cannot be empty.\r\n";
+        }
+
+        return errorMessage;
+    }
+
 }

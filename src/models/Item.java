@@ -6,7 +6,7 @@ public class Item {
 
     // Constructor
 
-    public Item(String id, String sellerId, String name, String size, double price, String category, ItemStatus status)
+    public Item(String id, String sellerId, String name, String size, double price, String category, ItemStatus status, String note)
     {
         this.id = id;
         this.sellerId = sellerId;
@@ -15,6 +15,7 @@ public class Item {
         this.price = price;
         this.category = category;
         this.status = status;
+        this.note = note;
     }
 
     // Properties
@@ -26,6 +27,7 @@ public class Item {
     private double price;
     private String category;
     private ItemStatus status;
+    private String note;
 
     // Getters
 
@@ -55,6 +57,10 @@ public class Item {
 
     public ItemStatus getStatus() {
         return status;
+    }
+
+    public String getNote() {
+        return note;
     }
 
 }

@@ -4,10 +4,7 @@ import controllers.ItemController;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -69,6 +66,9 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
         priceColumn.setCellValueFactory(new PropertyValueFactory<Item, Double>("price"));
 
         itemsTable.getColumns().addAll(nameColumn, categoryColumn, sizeColumn, priceColumn);
+
+        // Autofit columns
+        itemsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         switch (currentUser.getRole()) {
             case SELLER -> contentBox = getSellerContent();
@@ -139,22 +139,75 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
         VBox adminContent = new VBox();
         adminContent.setSpacing(10);
 
+        Label tipLabel = new Label("*) Listed items above are items requested by sellers. " +
+                "You can select and then approve or decline an item from here.");
+
         GridPane buttonGrid = new GridPane();
         buttonGrid.setHgap(10);
         buttonGrid.setVgap(10);
 
-        Button acceptItemButton = new Button("Accept item");
-        acceptItemButton.setOnAction(this);
+        Button approveItemButton = new Button("Approve item");
+        approveItemButton.setOnMouseClicked(evt -> {
+            Item selectedItem = itemsTable.getSelectionModel().getSelectedItem();
+
+            if (selectedItem == null) {
+                MainViewController.getInstance(null).showAlert(
+                        false,
+                        "Error",
+                        "Please select an item to approve."
+                );
+                return;
+            }
+
+            Response<Item> approveItemResponse = ItemController.approveItem(selectedItem.getId());
+
+            MainViewController.getInstance(null).showAlert(
+                    approveItemResponse.getIsSuccess(),
+                    approveItemResponse.getIsSuccess() ? "Success" : "Error",
+                    approveItemResponse.getMessage()
+            );
+
+            refreshRequestedItemsTable();
+        });
+
+        TextField reasonField = new TextField();
+        reasonField.setPrefWidth(200);
+        reasonField.setPromptText("Reason for declining");
 
         Button declineItemButton = new Button("Decline item");
-        declineItemButton.setOnAction(this);
+        declineItemButton.setOnMouseClicked(evt -> {
+            Item selectedItem = itemsTable.getSelectionModel().getSelectedItem();
 
-        buttonGrid.add(acceptItemButton, 0, 0);
-        buttonGrid.add(declineItemButton, 1, 0);
+            if (selectedItem == null) {
+                MainViewController.getInstance(null).showAlert(
+                        false,
+                        "Error",
+                        "Please select an item to decline."
+                );
+                return;
+            }
+
+            Response<Item> declineItemResponse = ItemController.declineItem(selectedItem.getId(), reasonField.getText());
+
+            MainViewController.getInstance(null).showAlert(
+                    declineItemResponse.getIsSuccess(),
+                    declineItemResponse.getIsSuccess() ? "Success" : "Error",
+                    declineItemResponse.getMessage()
+            );
+
+            reasonField.setText("");
+            refreshRequestedItemsTable();
+        });
+
+        HBox declineItemBox = new HBox();
+        declineItemBox.getChildren().addAll(declineItemButton, reasonField);
+
+        buttonGrid.add(approveItemButton, 0, 0);
+        buttonGrid.add(declineItemBox, 1, 0);
 
         refreshRequestedItemsTable();
 
-        adminContent.getChildren().addAll(itemsTable, buttonGrid);
+        adminContent.getChildren().addAll(itemsTable, tipLabel, buttonGrid);
 
         return adminContent;
     }
