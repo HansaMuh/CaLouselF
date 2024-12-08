@@ -4,6 +4,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import models.User;
+import views.HomeView;
 import views.LoginView;
 import views.MainView;
 import views.RegisterView;
@@ -58,11 +59,18 @@ public class MainViewController {
             stage.setTitle("Log in | CaLouselF");
             stage.setWidth(450);
             stage.setHeight(300);
-        } else if (pages.lastElement() instanceof RegisterView) {
+        }
+        else if (pages.lastElement() instanceof RegisterView) {
             stage.setTitle("Register account | CaLouselF");
             stage.setWidth(450);
             stage.setHeight(450);
-        } else {
+        }
+        else if (pages.lastElement() instanceof HomeView) {
+            stage.setTitle("Home | CaLouselF");
+            stage.setWidth(825);
+            stage.setHeight(675);
+        }
+        else {
             stage.setTitle("CaLouselF");
             stage.setWidth(800);
             stage.setHeight(600);
@@ -112,7 +120,13 @@ public class MainViewController {
     }
 
     public void navigateToHome(User user) {
+        HomeView view = new HomeView(user);
+        pages.add(view);
 
+        mainView.getContainer().setCenter(view);
+        mainView.setTopLevelBorder(false);
+
+        refreshStage();
     }
 
 }

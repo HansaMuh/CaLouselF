@@ -1,6 +1,8 @@
 package enums;
 
 public enum UserRole {
-    Seller,
-    Buyer
+    SELLER,
+    BUYER,
+
+    ADMIN
 }

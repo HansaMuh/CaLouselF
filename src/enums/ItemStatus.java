@@ -1,7 +1,8 @@
 package enums;
 
 public enum ItemStatus {
-    Pending,
-    Approved,
-    Declined
+    PENDING,
+    APPROVED,
+    DECLINED,
+    SOLD_OUT
 }
