@@ -13,6 +13,100 @@ public class ItemController {
 
     // Methods
 
+    // Designed for: Browse Item feature
+    // This method is used to browse through available items that contains the keyword in their name.
+    public static Response<ArrayList<Item>> browseAvailableItems(String keyword) {
+        ArrayList<Item> items = new ArrayList<>();
+
+        String query = "SELECT * FROM items WHERE status = ? AND LOWER(name) LIKE ?;";
+        String status = ItemStatus.APPROVED.toString();
+
+        try {
+            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+
+            statement.setString(1, keyword.toLowerCase());
+            statement.setString(2, status);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Item item = new Item(
+                        resultSet.getString("id"),
+                        resultSet.getString("seller_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("size"),
+                        resultSet.getDouble("price"),
+                        resultSet.getString("category"),
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
+                );
+
+                items.add(item);
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to browse items:\r\n- " + ex.getMessage(),
+                    items
+            );
+        }
+
+        return new Response<>(
+                true,
+                "Items browsed successfully.",
+                items
+        );
+    }
+
+    // Designed for: Browse Item feature
+    // This method is used to browse through available items that contains the keyword in their name.
+    public static Response<ArrayList<Item>> browseRequestedItems(String keyword) {
+        ArrayList<Item> items = new ArrayList<>();
+
+        String query = "SELECT * FROM items WHERE status = ? AND LOWER(name) LIKE ?;";
+        String status = ItemStatus.PENDING.toString();
+
+        try {
+            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+
+            statement.setString(1, keyword.toLowerCase());
+            statement.setString(2, status);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Item item = new Item(
+                        resultSet.getString("id"),
+                        resultSet.getString("seller_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("size"),
+                        resultSet.getDouble("price"),
+                        resultSet.getString("category"),
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
+                );
+
+                items.add(item);
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to browse items:\r\n- " + ex.getMessage(),
+                    items
+            );
+        }
+
+        return new Response<>(
+                true,
+                "Items browsed successfully.",
+                items
+        );
+    }
+
     // Designed for: View Item feature
     // Available items are items that have been approved by the Admin and are still available for purchase from the
     // list.

@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -13,6 +14,9 @@ import models.Item;
 import models.User;
 import modules.Response;
 import view_controllers.MainViewController;
+import views.subviews.AdminHomeSubview;
+import views.subviews.BuyerHomeSubview;
+import views.subviews.SellerHomeSubview;
 
 import java.util.ArrayList;
 
@@ -30,18 +34,36 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
     // Properties
 
     private User currentUser;
+    private VBox currentSubview;
 
-    private Label titleLabel;
-    private Label captionLabel;
+    private Button logoutButton;
 
     private HBox topLevelMenu;
-    private VBox contentBox;
-    private Button logoutButton;
-    private TableView<Item> itemsTable;
+    private BorderPane dashboardPane;
+    private HBox browseBox;
+
+    private Label titleLabel;
+
+    private Label captionLabel;
+    private TextField browseField;
+    private Button browseButton;
 
     // Methods
 
     private void init() {
+        switch (currentUser.getRole()) {
+            case SELLER -> currentSubview = new SellerHomeSubview(this);
+            case BUYER -> currentSubview = new BuyerHomeSubview(this);
+            case ADMIN -> currentSubview = new AdminHomeSubview(this);
+        }
+
+        logoutButton = new Button("Log out");
+        logoutButton.setOnAction(this);
+
+        topLevelMenu = new HBox();
+        dashboardPane = new BorderPane();
+        browseBox = new HBox();
+
         titleLabel = new Label("Dashboard");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
@@ -49,32 +71,11 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
                 new Label("Welcome, " + currentUser.getUsername() + "! You are currently logged in as a " + currentUser.getRole().toString().toLowerCase() + ".");
         captionLabel.setStyle("-fx-font-size: 14px;");
 
-        topLevelMenu = new HBox();
+        browseField = new TextField();
+        browseField.setPromptText("Enter a keyword...");
 
-        logoutButton = new Button("Log out");
-        logoutButton.setOnAction(this);
-
-        itemsTable = new TableView<>();
-        TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
-        TableColumn<Item, String> categoryColumn = new TableColumn<>("Category");
-        TableColumn<Item, String> sizeColumn = new TableColumn<>("Size");
-        TableColumn<Item, Double> priceColumn = new TableColumn<>("Price (IDR)");
-
-        nameColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("name"));
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("category"));
-        sizeColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("size"));
-        priceColumn.setCellValueFactory(new PropertyValueFactory<Item, Double>("price"));
-
-        itemsTable.getColumns().addAll(nameColumn, categoryColumn, sizeColumn, priceColumn);
-
-        // Autofit columns
-        itemsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        switch (currentUser.getRole()) {
-            case SELLER -> contentBox = getSellerContent();
-            case BUYER -> contentBox = getBuyerContent();
-            case ADMIN -> contentBox = getAdminContent();
-        }
+        browseButton = new Button("Browse");
+        browseButton.setOnAction(this);
     }
 
     private void setLayout() {
@@ -84,156 +85,50 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
         topLevelMenu.setSpacing(10);
         topLevelMenu.getChildren().add(logoutButton);
 
-        getChildren().addAll(topLevelMenu, titleLabel, captionLabel, contentBox);
+        dashboardPane.setLeft(captionLabel);
+        dashboardPane.setRight(browseBox);
+
+        browseBox.setSpacing(5);
+        browseBox.getChildren().addAll(browseField, browseButton);
+
+        getChildren().addAll(topLevelMenu, titleLabel, dashboardPane, currentSubview);
     }
 
-    private VBox getSellerContent() {
-        VBox sellerContent = new VBox();
-        sellerContent.setSpacing(10);
+    private void browseAvailableItems() {
+        String keyword = browseField.getText();
 
-        GridPane buttonGrid = new GridPane();
-        buttonGrid.setHgap(10);
-        buttonGrid.setVgap(10);
+        Response<ArrayList<Item>> browseItemsResponse = ItemController.browseAvailableItems(keyword);
 
-        Button viewItemsButton = new Button("View my items");
-        viewItemsButton.setOnAction(this);
-
-        Button uploadItemButton = new Button("Upload new item");
-        uploadItemButton.setOnAction(this);
-
-        buttonGrid.add(viewItemsButton, 0, 0);
-        buttonGrid.add(uploadItemButton, 1, 0);
-
-        refreshAvailableItemsTable();
-
-        sellerContent.getChildren().addAll(itemsTable, buttonGrid);
-
-        return sellerContent;
-    }
-
-    private VBox getBuyerContent() {
-        VBox buyerContent = new VBox();
-        buyerContent.setSpacing(10);
-
-        GridPane buttonGrid = new GridPane();
-        buttonGrid.setHgap(10);
-        buttonGrid.setVgap(10);
-
-        Button viewWishlistButton = new Button("View wishlist");
-        viewWishlistButton.setOnAction(this);
-
-        Button viewPurchaseHistoryButton = new Button("View purchase history");
-        viewPurchaseHistoryButton.setOnAction(this);
-
-        buttonGrid.add(viewWishlistButton, 0, 0);
-        buttonGrid.add(viewPurchaseHistoryButton, 1, 0);
-
-        refreshAvailableItemsTable();
-
-        buyerContent.getChildren().addAll(itemsTable, buttonGrid);
-
-        return buyerContent;
-    }
-
-    private VBox getAdminContent() {
-        VBox adminContent = new VBox();
-        adminContent.setSpacing(10);
-
-        Label tipLabel = new Label("*) Listed items above are items requested by sellers. " +
-                "You can select and then approve or decline an item from here.");
-
-        GridPane buttonGrid = new GridPane();
-        buttonGrid.setHgap(10);
-        buttonGrid.setVgap(10);
-
-        Button approveItemButton = new Button("Approve item");
-        approveItemButton.setOnMouseClicked(evt -> {
-            Item selectedItem = itemsTable.getSelectionModel().getSelectedItem();
-
-            if (selectedItem == null) {
-                MainViewController.getInstance(null).showAlert(
-                        false,
-                        "Error",
-                        "Please select an item to approve."
-                );
-                return;
-            }
-
-            Response<Item> approveItemResponse = ItemController.approveItem(selectedItem.getId());
-
+        if (!browseItemsResponse.getIsSuccess()) {
             MainViewController.getInstance(null).showAlert(
-                    approveItemResponse.getIsSuccess(),
-                    approveItemResponse.getIsSuccess() ? "Success" : "Error",
-                    approveItemResponse.getMessage()
+                    false,
+                    "Error",
+                    browseItemsResponse.getMessage()
             );
-
-            refreshRequestedItemsTable();
-        });
-
-        TextField reasonField = new TextField();
-        reasonField.setPrefWidth(200);
-        reasonField.setPromptText("Reason for declining");
-
-        Button declineItemButton = new Button("Decline item");
-        declineItemButton.setOnMouseClicked(evt -> {
-            Item selectedItem = itemsTable.getSelectionModel().getSelectedItem();
-
-            if (selectedItem == null) {
-                MainViewController.getInstance(null).showAlert(
-                        false,
-                        "Error",
-                        "Please select an item to decline."
-                );
-                return;
-            }
-
-            Response<Item> declineItemResponse = ItemController.declineItem(selectedItem.getId(), reasonField.getText());
-
-            MainViewController.getInstance(null).showAlert(
-                    declineItemResponse.getIsSuccess(),
-                    declineItemResponse.getIsSuccess() ? "Success" : "Error",
-                    declineItemResponse.getMessage()
-            );
-
-            reasonField.setText("");
-            refreshRequestedItemsTable();
-        });
-
-        HBox declineItemBox = new HBox();
-        declineItemBox.getChildren().addAll(declineItemButton, reasonField);
-
-        buttonGrid.add(approveItemButton, 0, 0);
-        buttonGrid.add(declineItemBox, 1, 0);
-
-        refreshRequestedItemsTable();
-
-        adminContent.getChildren().addAll(itemsTable, tipLabel, buttonGrid);
-
-        return adminContent;
-    }
-
-    private void refreshAvailableItemsTable() {
-        Response<ArrayList<Item>> availableItemsResponse = ItemController.getAvailableItems();
-
-        if (!availableItemsResponse.getIsSuccess()) {
-            System.out.println(availableItemsResponse.getMessage());
             return;
         }
 
-        itemsTable.getItems().clear();
-        itemsTable.getItems().addAll(availableItemsResponse.getOutput());
+        switch (currentUser.getRole()) {
+            case SELLER -> ((SellerHomeSubview) currentSubview).refreshTableContent(browseItemsResponse.getOutput());
+            case BUYER -> ((BuyerHomeSubview) currentSubview).refreshTableContent(browseItemsResponse.getOutput());
+        }
     }
 
-    private void refreshRequestedItemsTable() {
-        Response<ArrayList<Item>> requestedItemsResponse = ItemController.getRequestedItems();
+    private void browseRequestedItems() {
+        String keyword = browseField.getText();
 
-        if (!requestedItemsResponse.getIsSuccess()) {
-            System.out.println(requestedItemsResponse.getMessage());
+        Response<ArrayList<Item>> browseItemsResponse = ItemController.browseRequestedItems(keyword);
+
+        if (!browseItemsResponse.getIsSuccess()) {
+            MainViewController.getInstance(null).showAlert(
+                    false,
+                    "Error",
+                    browseItemsResponse.getMessage()
+            );
             return;
         }
 
-        itemsTable.getItems().clear();
-        itemsTable.getItems().addAll(requestedItemsResponse.getOutput());
+        ((AdminHomeSubview) currentSubview).refreshTableContent(browseItemsResponse.getOutput());
     }
 
     // Overrides
@@ -241,11 +136,16 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent evt)
     {
-        if (evt.getSource() == logoutButton)
-        {
+        if (evt.getSource() == logoutButton) {
             MainViewController.getInstance(null).showAlert(true,
                     "Log out", "You have been logged out.");
             MainViewController.getInstance(null).navigateBack();
+        }
+        else if (evt.getSource() == browseButton) {
+            switch (currentUser.getRole()) {
+                case SELLER, BUYER -> browseAvailableItems();
+                case ADMIN -> browseRequestedItems();
+            }
         }
     }
 
