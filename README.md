@@ -1,7 +1,7 @@
 # CaLouselF
 Developed with Java and MySQL, CaLouselF is a marketplace application specifically designed to facilitate the buying and selling of second-hand clothing easily and safely. This application is designed with Model-View-Controller (MVC) architecture in mind.
 
-## Checklist of Features
+## Feature Checklist
 - [x] Register
 - [x] Login
 - [ ] Upload Item
@@ -10,9 +10,9 @@ Developed with Java and MySQL, CaLouselF is a marketplace application specifical
 - [ ] View Item
 - [ ] Purchase Item
 - [ ] Make Offer
-- [ ] View Requested Item
-- [ ] Approve Item
-- [ ] Decline Item
+- [x] View Requested Item
+- [x] Approve Item
+- [x] Decline Item
 - [ ] View Offered Item
 - [ ] Accept Offer
 - [ ] Decline Offer
