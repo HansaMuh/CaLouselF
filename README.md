@@ -7,7 +7,7 @@ Developed with Java and MySQL, CaLouselF is a marketplace application specifical
 - [ ] Upload Item
 - [ ] Edit Item
 - [ ] Delete Item
-- [ ] View Item
+- [x] View Item
 - [ ] Purchase Item
 - [ ] Make Offer
 - [x] View Requested Item
@@ -16,7 +16,7 @@ Developed with Java and MySQL, CaLouselF is a marketplace application specifical
 - [ ] View Offered Item
 - [ ] Accept Offer
 - [ ] Decline Offer
-- [ ] Add Item to Wishlist
-- [ ] View Wishlist
-- [ ] Remove Item from Wishlist
-- [ ] View Purchase History
+- [x] Add Item to Wishlist
+- [x] View Wishlist
+- [x] Remove Item from Wishlist
+- [x] View Purchase History

@@ -11,9 +11,9 @@ public class PurchaseHistoryViewController {
  private PurchaseHistoryController controller;
 
  public PurchaseHistoryViewController(int userId) {
-     PurchaseHistoryView purchaseHistoryView = new PurchaseHistoryView();
-     controller = new PurchaseHistoryController(purchaseHistoryView, userId);
-     view = purchaseHistoryView.getView();
+//     PurchaseHistoryView purchaseHistoryView = new PurchaseHistoryView();
+//     controller = new PurchaseHistoryController(purchaseHistoryView, userId);
+//     view = purchaseHistoryView.getView();
  }
 
  public VBox getView() {

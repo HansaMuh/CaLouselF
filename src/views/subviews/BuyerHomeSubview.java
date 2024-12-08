@@ -1,6 +1,7 @@
 package views.subviews;
 
 import controllers.ItemController;
+import controllers.WishlistController;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -12,6 +13,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Item;
+import models.User;
+import models.Wishlist;
 import modules.Response;
 import view_controllers.MainViewController;
 import views.HomeView;
@@ -22,8 +25,8 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
 
     // Constructor
 
-    public BuyerHomeSubview(HomeView parentView) {
-        this.parentView = parentView;
+    public BuyerHomeSubview(User currentUser) {
+        this.currentUser = currentUser;
 
         init();
         setLayout();
@@ -31,6 +34,8 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
     }
 
     // Properties
+
+    private User currentUser;
 
     private HomeView parentView;
 
@@ -133,12 +138,45 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
         itemsTable.getItems().addAll(items);
     }
 
+    // Helpers
+
+    private Item getSelectedItem() {
+        Item selectedItem = itemsTable.getSelectionModel().getSelectedItem();
+
+        if (selectedItem == null) {
+            MainViewController.getInstance(null).showAlert(
+                    false,
+                    "Error",
+                    "Please select an item."
+            );
+            return null;
+        }
+
+        return selectedItem;
+    }
+
+    private void addToWishlist() {
+        Item item = getSelectedItem();
+
+        if (item == null) {
+            return;
+        }
+
+        Response<Wishlist> addToWishlistResponse = WishlistController.addWishlist(item.getId(), currentUser.getId());
+
+        MainViewController.getInstance(null).showAlert(
+                addToWishlistResponse.getIsSuccess(),
+                addToWishlistResponse.getIsSuccess() ? "Success" : "Error",
+                addToWishlistResponse.getMessage()
+        );
+    }
+
     // Overrides
 
     @Override
     public void handle(ActionEvent evt) {
         if (evt.getSource() == addToWishlistButton) {
-            // TODO: Add item to wishlist
+            addToWishlist();
         }
         else if (evt.getSource() == purchaseButton) {
             // TODO: Purchase item
@@ -147,10 +185,10 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
             // TODO: Make an offer
         }
         else if (evt.getSource() == viewWishlistButton) {
-            // TODO: View wishlist
+            MainViewController.getInstance(null).navigateToWishlist(currentUser);
         }
         else if (evt.getSource() == viewPurchaseHistoryButton) {
-            // TODO: View purchase history
+            MainViewController.getInstance(null).navigateToPurchaseHistory(currentUser);
         }
     }
 

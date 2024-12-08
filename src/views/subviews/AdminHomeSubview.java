@@ -9,9 +9,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Item;
+import models.User;
 import modules.Response;
 import view_controllers.MainViewController;
-import views.HomeView;
 
 import java.util.ArrayList;
 
@@ -19,8 +19,8 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
 
     // Constructor
 
-    public AdminHomeSubview(HomeView parentView) {
-        this.parentView = parentView;
+    public AdminHomeSubview(User currentUser) {
+        this.currentUser = currentUser;
 
         init();
         setLayout();
@@ -29,7 +29,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
 
     // Properties
 
-    private HomeView parentView;
+    private User currentUser;
 
     private TableView<Item> itemsTable;
 

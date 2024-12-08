@@ -64,6 +64,7 @@ public class UserController {
             }
         }
         catch (Exception ex) {
+            ex.printStackTrace();
             return new Response<>(
                     false,
                     "An error occurred while logging in.",
@@ -90,10 +91,19 @@ public class UserController {
             );
         }
 
-        Response<Integer> userCountResponse = checkUserCount();
+        Response<String> latestUserIdResponse = checkLatestUserId();
+        if (!latestUserIdResponse.getIsSuccess()) {
+            return new Response<>(
+                    false,
+                    "An error occurred while registering.",
+                    null
+            );
+        }
 
-        String id = String.format("UID%04d", userCountResponse.getOutput() + 1); // e.g. UID0001
+        int idNumber = Integer.parseInt(latestUserIdResponse.getOutput().substring(3));
+        String id = String.format("UID%04d", idNumber + 1); // e.g. UID0001
         UserRole userRole = UserRole.valueOf(role.toUpperCase());
+
         User user = new User(id, username, password, phoneNumber, address, userRole);
 
         String query = "INSERT INTO users (id, username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?, ?);";
@@ -110,6 +120,7 @@ public class UserController {
             statement.execute();
         }
         catch (Exception ex) {
+            ex.printStackTrace();
             return new Response<>(
                     false,
                     "An error occurred while saving the user.",
@@ -149,32 +160,30 @@ public class UserController {
         }
     }
 
-    public static Response<Integer> checkUserCount() {
-        String query = "SELECT COUNT(*) AS user_count FROM users;";
+    public static Response<String> checkLatestUserId() {
+        String userId = "UID0000";
+
+        String query = "SELECT u.id FROM users AS u ORDER BY id DESC LIMIT 1;";
         try {
             PreparedStatement statement = Database.getInstance().prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                return new Response<>(
-                        true,
-                        "User count retrieved.",
-                        resultSet.getInt("user_count")
-                );
+                userId = resultSet.getString("id");
             }
         }
         catch (Exception ex) {
             return new Response<>(
                     false,
-                    "An error occurred while retrieving user count.",
+                    "An error occurred while retrieving latest user ID.",
                     null
             );
         }
 
         return new Response<>(
-                false,
-                "User count not found.",
-                0
+                true,
+                "Latest user ID retrieved.",
+                userId
         );
     }
 

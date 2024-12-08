@@ -12,9 +12,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import models.Item;
+import models.User;
 import modules.Response;
 import view_controllers.MainViewController;
-import views.HomeView;
 
 import java.util.ArrayList;
 
@@ -22,8 +22,8 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
 
     // Constructor
 
-    public SellerHomeSubview(HomeView parentView) {
-        this.parentView = parentView;
+    public SellerHomeSubview(User currentUser) {
+        this.currentUser = currentUser;
 
         init();
         setLayout();
@@ -32,7 +32,7 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
 
     // Properties
 
-    private HomeView parentView;
+    private User currentUser;
 
     private TableView<Item> itemsTable;
 

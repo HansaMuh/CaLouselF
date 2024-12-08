@@ -4,10 +4,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import models.User;
-import views.HomeView;
-import views.LoginView;
-import views.MainView;
-import views.RegisterView;
+import views.*;
 
 import java.util.Stack;
 
@@ -54,21 +51,41 @@ public class MainViewController {
         return pages.size() > 1;
     }
 
-    private void refreshStage() {
+    private void refresh() {
         if (pages.lastElement() instanceof LoginView) {
             stage.setTitle("Log in | CaLouselF");
             stage.setWidth(450);
             stage.setHeight(300);
+
+            mainView.setTopLevelBorder(false);
         }
         else if (pages.lastElement() instanceof RegisterView) {
             stage.setTitle("Register account | CaLouselF");
             stage.setWidth(450);
             stage.setHeight(450);
+
+            mainView.setTopLevelBorder(true);
         }
         else if (pages.lastElement() instanceof HomeView) {
             stage.setTitle("Home | CaLouselF");
             stage.setWidth(825);
             stage.setHeight(675);
+
+            mainView.setTopLevelBorder(false);
+        }
+        else if (pages.lastElement() instanceof WishlistView) {
+            stage.setTitle("Wishlist | CaLouselF");
+            stage.setWidth(825);
+            stage.setHeight(675);
+
+            mainView.setTopLevelBorder(true);
+        }
+        else if (pages.lastElement() instanceof PurchaseHistoryView) {
+            stage.setTitle("Purchase History | CaLouselF");
+            stage.setWidth(825);
+            stage.setHeight(675);
+
+            mainView.setTopLevelBorder(true);
         }
         else {
             stage.setTitle("CaLouselF");
@@ -91,11 +108,12 @@ public class MainViewController {
     // Methods
 
     public void navigateBack() {
-        pages.pop();
+        if (isViewMultilayered()) {
+            pages.pop();
+            mainView.getContainer().setCenter(pages.lastElement());
+        }
 
-        mainView.getContainer().setCenter(pages.lastElement());
-        mainView.setTopLevelBorder(isViewMultilayered());
-        refreshStage();
+        refresh();
     }
 
     public void navigateToLogin() {
@@ -103,9 +121,8 @@ public class MainViewController {
         pages.add(view);
 
         mainView.getContainer().setCenter(view);
-        mainView.setTopLevelBorder(false);
 
-        refreshStage();
+        refresh();
         stage.centerOnScreen();
     }
 
@@ -114,9 +131,8 @@ public class MainViewController {
         pages.add(view);
 
         mainView.getContainer().setCenter(view);
-        mainView.setTopLevelBorder(true);
 
-        refreshStage();
+        refresh();
     }
 
     public void navigateToHome(User user) {
@@ -124,9 +140,26 @@ public class MainViewController {
         pages.add(view);
 
         mainView.getContainer().setCenter(view);
-        mainView.setTopLevelBorder(false);
 
-        refreshStage();
+        refresh();
+    }
+
+    public void navigateToWishlist(User user) {
+        WishlistView view = new WishlistView(user);
+        pages.add(view);
+
+        mainView.getContainer().setCenter(view);
+
+        refresh();
+    }
+
+    public void navigateToPurchaseHistory(User user) {
+        PurchaseHistoryView view = new PurchaseHistoryView(user);
+        pages.add(view);
+
+        mainView.getContainer().setCenter(view);
+
+        refresh();
     }
 
 }

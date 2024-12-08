@@ -48,7 +48,7 @@ public class PurchaseHistoryController {
 //             transaction.setPrice(rs.getDouble("price"));
 //             transactions.add(transaction);
          }
-         view.getTableView().setItems(transactions);
+         //view.getTableView().setItems(transactions);
      } catch (SQLException e) {
          showAlert("Database Error", "An error occurred while loading purchase history.");
      }

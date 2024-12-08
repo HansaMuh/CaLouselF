@@ -1,53 +1,122 @@
 package views;
 
-//File: views/PurchaseHistoryView.java
-
+import controllers.TransactionController;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import models.Transaction;
 import models.Item;
+import models.User;
+import modules.Response;
+import view_controllers.MainViewController;
 
-public class PurchaseHistoryView {
- private VBox view;
- private TableView<Transaction> tableView;
+import java.util.ArrayList;
 
- public PurchaseHistoryView() {
-     view = new VBox();
-     view.setPadding(new Insets(20));
-     view.setSpacing(10);
+public class PurchaseHistoryView extends VBox implements EventHandler<ActionEvent> {
 
-     tableView = new TableView<>();
+    // Constructor
 
-     TableColumn<Transaction, Integer> transactionIdCol = new TableColumn<>("Transaction ID");
-     transactionIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+    public PurchaseHistoryView(User currentUser) {
+        this.currentUser = currentUser;
 
-     TableColumn<Transaction, String> itemNameCol = new TableColumn<>("Item Name");
-     itemNameCol.setCellValueFactory(new PropertyValueFactory<>("itemName")); // Perlu diubah di controller
+        init();
+        setLayout();
+        setTable();
+    }
 
-     TableColumn<Transaction, String> categoryCol = new TableColumn<>("Category");
-     categoryCol.setCellValueFactory(new PropertyValueFactory<>("category")); // Perlu diubah di controller
+    // Properties
 
-     TableColumn<Transaction, String> sizeCol = new TableColumn<>("Size");
-     sizeCol.setCellValueFactory(new PropertyValueFactory<>("size")); // Perlu diubah di controller
+    private User currentUser;
 
-     TableColumn<Transaction, Double> priceCol = new TableColumn<>("Price");
-     priceCol.setCellValueFactory(new PropertyValueFactory<>("price")); // Perlu diubah di controller
+    private BorderPane dashboardPane;
+    private HBox bottomPane;
 
-     TableColumn<Transaction, String> dateCol = new TableColumn<>("Transaction Date");
-     dateCol.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
+    private Label titleLabel;
+    private Label captionLabel;
 
-     tableView.getColumns().addAll(transactionIdCol, itemNameCol, categoryCol, sizeCol, priceCol, dateCol);
+    private TableView<Item> transactionalItemsTable;
 
-     view.getChildren().addAll(tableView);
- }
+    // Methods
 
- public VBox getView() {
-     return view;
- }
+    private void init() {
+        dashboardPane = new BorderPane();
+        bottomPane = new HBox();
 
- public TableView<Transaction> getTableView() { return tableView; }
+        titleLabel = new Label("Buyer's Purchase History");
+        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        captionLabel =
+                new Label("Here are the items you've purchased based on your transactions.");
+        captionLabel.setStyle("-fx-font-size: 14px;");
+
+        transactionalItemsTable = new TableView<>();
+    }
+
+    private void setLayout() {
+        setPadding(new Insets(10, 15, 10, 15));
+        setSpacing(15);
+
+        dashboardPane.setLeft(captionLabel);
+
+        bottomPane.setSpacing(10);
+
+        getChildren().addAll(titleLabel, dashboardPane, transactionalItemsTable, bottomPane);
+    }
+
+    private void setTable() {
+        TableColumn<Item, String> transactionIdColumn = new TableColumn<>("Transaction ID");
+        TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
+        TableColumn<Item, String> categoryColumn = new TableColumn<>("Category");
+        TableColumn<Item, String> sizeColumn = new TableColumn<>("Size");
+        TableColumn<Item, Double> priceColumn = new TableColumn<>("Price (IDR)");
+
+        transactionIdColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("id"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("name"));
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("category"));
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("size"));
+        priceColumn.setCellValueFactory(new PropertyValueFactory<Item, Double>("price"));
+
+        transactionalItemsTable.getColumns().addAll(transactionIdColumn, nameColumn, categoryColumn, sizeColumn,
+                priceColumn);
+
+        // Autofit columns
+        transactionalItemsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        refreshTableContent(null);
+    }
+
+    public void refreshTableContent(ArrayList<Item> items) {
+        if (items == null) {
+            Response<ArrayList<Item>> transactionalItemsResponse =
+                    TransactionController.getItemsByTransaction(currentUser.getId());
+
+            if (!transactionalItemsResponse.getIsSuccess()) {
+                MainViewController.getInstance(null).showAlert(
+                        transactionalItemsResponse.getIsSuccess(),
+                        transactionalItemsResponse.getIsSuccess() ? "Success" : "Error",
+                        transactionalItemsResponse.getMessage()
+                );
+                return;
+            }
+
+            items = transactionalItemsResponse.getOutput();
+        }
+
+        transactionalItemsTable.getItems().clear();
+        transactionalItemsTable.getItems().addAll(items);
+    }
+
+    // Overrides
+
+    @Override
+    public void handle(ActionEvent evt) {
+        // Empty
+    }
+
 }
-

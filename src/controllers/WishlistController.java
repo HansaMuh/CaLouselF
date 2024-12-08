@@ -1,100 +1,156 @@
 package controllers;
 
-//File: controllers/WishlistController.java
-
-import singleton.Database;
+import enums.ItemStatus;
+import enums.UserRole;
 import models.Item;
-import views.WishlistView;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableView;
+import models.Wishlist;
+import modules.Response;
+import singleton.Database;
 
-import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 public class WishlistController {
- private WishlistView view;
- private int userId; // ID pengguna yang sedang login sebagai buyer
 
- public WishlistController(WishlistView view, int userId) {
-     this.view = view;
-     this.userId = userId;
-     initialize();
- }
+    // Methods
 
- private void initialize() {
-     loadWishlistItems();
+    public static Response<ArrayList<Item>> getWishlistedItems(String userId) {
+        ArrayList<Item> items = new ArrayList<>();
 
-     view.getRemoveButton().setOnAction(e -> removeSelectedItem());
- }
+        String query = "SELECT i.* FROM wishlists AS w LEFT JOIN items AS i ON w.item_id = i.id WHERE w.user_id = ?;";
+        try {
+            PreparedStatement statement = Database.getInstance().prepareStatement(query);
 
- private void loadWishlistItems() {
-     ObservableList<Item> items = FXCollections.observableArrayList();
-     String query = "SELECT items.* FROM items INNER JOIN wishlists ON items.id = wishlists.item_id WHERE wishlists.user_id = ?";
+            statement.setString(1, userId);
 
-     try (Connection conn = Database.getConnection();
-          PreparedStatement stmt = conn.prepareStatement(query)) {
-         stmt.setInt(1, userId);
-         ResultSet rs = stmt.executeQuery();
-         while (rs.next()) {
-//             Item item = new Item();
-//             item.setId(rs.getInt("id"));
-//             item.setName(rs.getString("item_name"));
-//             item.setCategory(rs.getString("category"));
-//             item.setSize(rs.getString("size"));
-//             item.setPrice(rs.getDouble("price"));
-//             item.setStatus(rs.getString("status"));
-//             items.add(item);
-         }
-         view.getTableView().setItems(items);
-     } catch (SQLException e) {
-         showAlert("Database Error", "An error occurred while loading wishlist items.");
-     }
- }
+            ResultSet resultSet = statement.executeQuery();
 
- private void removeSelectedItem() {
-     TableView<Item> table = view.getTableView();
-     Item selectedItem = table.getSelectionModel().getSelectedItem();
-     if (selectedItem == null) {
-         showAlert("Selection Error", "Please select an item to remove from wishlist.");
-         return;
-     }
+            while (resultSet.next()) {
+                Item item = new Item(
+                        resultSet.getString("id"),
+                        resultSet.getString("seller_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("size"),
+                        resultSet.getDouble("price"),
+                        resultSet.getString("category"),
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
+                );
 
-     String delete = "DELETE FROM wishlists WHERE user_id = ? AND item_id = ?";
-     try (Connection conn = Database.getConnection();
-          PreparedStatement stmt = conn.prepareStatement(delete)) {
-         stmt.setInt(1, userId);
-//         stmt.setInt(2, selectedItem.getId());
-         int rows = stmt.executeUpdate();
-         if (rows > 0) {
-             showAlert("Success", "Item removed from wishlist.");
-             loadWishlistItems();
-         } else {
-             showAlert("Error", "Failed to remove item from wishlist.");
-         }
-     } catch (SQLException e) {
-         showAlert("Database Error", "An error occurred while removing the item from wishlist.");
-     }
- }
+                items.add(item);
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to get wishlisted items:\r\n- " + ex.getMessage(),
+                    items
+            );
+        }
 
- private void showAlert(String title, String message) {
-     Alert.AlertType alertType;
-     if (title.equalsIgnoreCase("Success") || title.equalsIgnoreCase("Info")) {
-         alertType = Alert.AlertType.INFORMATION;
-     } else if (title.contains("Error") || title.contains("Selection")) {
-         alertType = Alert.AlertType.ERROR;
-     } else {
-         alertType = Alert.AlertType.INFORMATION;
-     }
+        return new Response<>(
+                true,
+                "Wishlisted items retrieved successfully.",
+                items
+        );
+    }
 
-     Alert alert = new Alert(alertType);
-     alert.setTitle(title);
-     alert.setHeaderText(null);
-     alert.setContentText(message);
-     alert.showAndWait();
- }
+    public static Response<Wishlist> addWishlist(String itemId, String userId) {
+        Response<String> latestWishlistIdResponse = checkLatestWishlistId();
+
+        int idNumber = Integer.parseInt(latestWishlistIdResponse.getOutput().substring(3));
+        String id = String.format("WID%04d", idNumber + 1);
+
+        Wishlist wishlist = new Wishlist(
+                id,
+                itemId,
+                userId,
+                Calendar.getInstance().getTime()
+        );
+
+        String query = "INSERT INTO wishlists (id, item_id, user_id, date) VALUES (?, ?, ?, ?);";
+        try {
+            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+
+            statement.setString(1, wishlist.getId());
+            statement.setString(2, wishlist.getItemId());
+            statement.setString(3, wishlist.getUserId());
+            statement.setDate(4, new Date(wishlist.getDate().getTime()));
+
+            statement.execute();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to add wishlist:\r\n- " + ex.getMessage(),
+                    null
+            );
+        }
+
+        return new Response<>(
+                true,
+                "Wishlist added successfully.",
+                wishlist
+        );
+    }
+
+    public static Response<Wishlist> removeWishlist(String itemId, String userId) {
+        String query = "DELETE FROM wishlists WHERE item_id = ? AND user_id = ?;";
+        try {
+            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+
+            statement.setString(1, itemId);
+            statement.setString(2, userId);
+
+            statement.execute();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to remove wishlist:\r\n- " + ex.getMessage(),
+                    null
+            );
+        }
+
+        return new Response<>(
+                true,
+                "Wishlist removed successfully.",
+                null
+        );
+    }
+
+    public static Response<String> checkLatestWishlistId() {
+        String wishlistId = "WID0000";
+
+        String query = "SELECT w.id FROM wishlists AS w ORDER BY id DESC LIMIT 1;";
+        try {
+            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                wishlistId = resultSet.getString("id");
+            }
+        }
+        catch (Exception ex) {
+            return new Response<>(
+                    false,
+                    "An error occurred while retrieving latest wishlist ID.",
+                    null
+            );
+        }
+
+        return new Response<>(
+                true,
+                "Latest wishlist ID retrieved.",
+                wishlistId
+        );
+    }
+
 }
 

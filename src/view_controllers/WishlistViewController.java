@@ -11,9 +11,9 @@ public class WishlistViewController {
  private WishlistController controller;
 
  public WishlistViewController(int userId) {
-     WishlistView wishlistView = new WishlistView();
-     controller = new WishlistController(wishlistView, userId);
-     view = wishlistView.getView();
+//     WishlistView wishlistView = new WishlistView();
+//     controller = new WishlistController(wishlistView, userId);
+//     view = wishlistView.getView();
  }
 
  public VBox getView() {

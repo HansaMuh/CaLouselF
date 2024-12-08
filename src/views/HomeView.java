@@ -43,7 +43,6 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
     private HBox browseBox;
 
     private Label titleLabel;
-
     private Label captionLabel;
     private TextField browseField;
     private Button browseButton;
@@ -52,9 +51,9 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
 
     private void init() {
         switch (currentUser.getRole()) {
-            case SELLER -> currentSubview = new SellerHomeSubview(this);
-            case BUYER -> currentSubview = new BuyerHomeSubview(this);
-            case ADMIN -> currentSubview = new AdminHomeSubview(this);
+            case SELLER -> currentSubview = new SellerHomeSubview(currentUser);
+            case BUYER -> currentSubview = new BuyerHomeSubview(currentUser);
+            case ADMIN -> currentSubview = new AdminHomeSubview(currentUser);
         }
 
         logoutButton = new Button("Log out");
