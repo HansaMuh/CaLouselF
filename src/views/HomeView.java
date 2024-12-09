@@ -51,9 +51,16 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
 
     private void init() {
         switch (currentUser.getRole()) {
-            case SELLER -> currentSubview = new SellerHomeSubview(currentUser);
-            case BUYER -> currentSubview = new BuyerHomeSubview(currentUser);
-            case ADMIN -> currentSubview = new AdminHomeSubview(currentUser);
+            case SELLER:
+                currentSubview = new SellerHomeSubview(currentUser);
+                break;
+            case BUYER:
+                currentSubview = new BuyerHomeSubview(currentUser);
+                break;
+
+            case ADMIN:
+                currentSubview = new AdminHomeSubview(currentUser);
+                break;
         }
 
         logoutButton = new Button("Log out");
@@ -108,8 +115,12 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
         }
 
         switch (currentUser.getRole()) {
-            case SELLER -> ((SellerHomeSubview) currentSubview).refreshTableContent(browseItemsResponse.getOutput());
-            case BUYER -> ((BuyerHomeSubview) currentSubview).refreshTableContent(browseItemsResponse.getOutput());
+            case SELLER:
+                ((SellerHomeSubview) currentSubview).refreshTableContent(browseItemsResponse.getOutput());
+                break;
+            case BUYER:
+                ((BuyerHomeSubview) currentSubview).refreshTableContent(browseItemsResponse.getOutput());
+                break;
         }
     }
 
@@ -142,8 +153,14 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
         }
         else if (evt.getSource() == browseButton) {
             switch (currentUser.getRole()) {
-                case SELLER, BUYER -> browseAvailableItems();
-                case ADMIN -> browseRequestedItems();
+                case SELLER:
+                case BUYER:
+                    browseAvailableItems();
+                    break;
+
+                case ADMIN:
+                    browseRequestedItems();
+                    break;
             }
         }
     }
