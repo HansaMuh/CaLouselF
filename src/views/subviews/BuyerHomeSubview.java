@@ -26,6 +26,8 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
     // Constructor
 
     public BuyerHomeSubview(User currentUser) {
+        this.itemController = new ItemController();
+        this.wishlistController = new WishlistController();
         this.currentUser = currentUser;
 
         init();
@@ -35,6 +37,8 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
 
     // Properties
 
+    private ItemController itemController;
+    private WishlistController wishlistController;
     private User currentUser;
 
     private HomeView parentView;
@@ -120,7 +124,7 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {
-            Response<ArrayList<Item>> availableItemsResponse = ItemController.getAvailableItems();
+            Response<ArrayList<Item>> availableItemsResponse = itemController.getAvailableItems();
 
             if (!availableItemsResponse.getIsSuccess()) {
                 MainViewController.getInstance(null).showAlert(
@@ -162,7 +166,7 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
             return;
         }
 
-        Response<Wishlist> addToWishlistResponse = WishlistController.addWishlist(item.getId(), currentUser.getId());
+        Response<Wishlist> addToWishlistResponse = wishlistController.addWishlist(item.getId(), currentUser.getId());
 
         MainViewController.getInstance(null).showAlert(
                 addToWishlistResponse.getIsSuccess(),

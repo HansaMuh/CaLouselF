@@ -26,6 +26,7 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
     // Constructor
 
     public WishlistView(User currentUser) {
+        this.currentController = new WishlistController();
         this.currentUser = currentUser;
 
         init();
@@ -35,6 +36,7 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
 
     // Properties
 
+    private WishlistController currentController;
     private User currentUser;
 
     private BorderPane dashboardPane;
@@ -99,7 +101,7 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {
-            Response<ArrayList<Item>> wishlistedItemsResponse = WishlistController.getWishlistedItems(currentUser.getId());
+            Response<ArrayList<Item>> wishlistedItemsResponse = currentController.getWishlistedItems(currentUser.getId());
 
             if (!wishlistedItemsResponse.getIsSuccess()) {
                 MainViewController.getInstance(null).showAlert(
@@ -141,7 +143,7 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
             return;
         }
 
-        Response<Wishlist> removeWishlistResponse = WishlistController.removeWishlist(item.getId(), currentUser.getId());
+        Response<Wishlist> removeWishlistResponse = currentController.removeWishlist(item.getId(), currentUser.getId());
 
         MainViewController.getInstance(null).showAlert(
                 removeWishlistResponse.getIsSuccess(),

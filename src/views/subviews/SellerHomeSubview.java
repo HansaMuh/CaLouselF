@@ -23,6 +23,7 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
     // Constructor
 
     public SellerHomeSubview(User currentUser) {
+        this.itemController = new ItemController();
         this.currentUser = currentUser;
 
         init();
@@ -32,6 +33,7 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
 
     // Properties
 
+    private ItemController itemController;
     private User currentUser;
 
     private TableView<Item> itemsTable;
@@ -89,7 +91,7 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {
-            Response<ArrayList<Item>> availableItemsResponse = ItemController.getAvailableItems();
+            Response<ArrayList<Item>> availableItemsResponse = itemController.getAvailableItems();
 
             if (!availableItemsResponse.getIsSuccess()) {
                 MainViewController.getInstance(null).showAlert(

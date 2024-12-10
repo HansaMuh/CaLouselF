@@ -1,5 +1,7 @@
 package controllers;
 
+// Unused
+
 //File: controllers/AdminController.java
 
 import singleton.Database;

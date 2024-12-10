@@ -23,6 +23,7 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
     // Constructor
 
     public PurchaseHistoryView(User currentUser) {
+        this.currentController = new TransactionController();
         this.currentUser = currentUser;
 
         init();
@@ -32,6 +33,7 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
 
     // Properties
 
+    private TransactionController currentController;
     private User currentUser;
 
     private BorderPane dashboardPane;
@@ -94,7 +96,7 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {
             Response<ArrayList<Item>> transactionalItemsResponse =
-                    TransactionController.getItemsByTransaction(currentUser.getId());
+                    currentController.getItemsByTransaction(currentUser.getId());
 
             if (!transactionalItemsResponse.getIsSuccess()) {
                 MainViewController.getInstance(null).showAlert(

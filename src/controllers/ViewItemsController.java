@@ -1,5 +1,7 @@
 package controllers;
 
+// Unused
+
 //File: controllers/ViewItemsController.java
 
 import singleton.Database;

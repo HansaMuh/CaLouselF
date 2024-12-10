@@ -25,6 +25,7 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
     // Constructor
 
     public HomeView(User currentUser) {
+        this.currentController = new ItemController();
         this.currentUser = currentUser;
 
         init();
@@ -33,6 +34,7 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
 
     // Properties
 
+    private ItemController currentController;
     private User currentUser;
     private VBox currentSubview;
 
@@ -103,7 +105,7 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
     private void browseAvailableItems() {
         String keyword = browseField.getText();
 
-        Response<ArrayList<Item>> browseItemsResponse = ItemController.browseAvailableItems(keyword);
+        Response<ArrayList<Item>> browseItemsResponse = currentController.browseAvailableItems(keyword);
 
         if (!browseItemsResponse.getIsSuccess()) {
             MainViewController.getInstance(null).showAlert(
@@ -127,7 +129,7 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
     private void browseRequestedItems() {
         String keyword = browseField.getText();
 
-        Response<ArrayList<Item>> browseItemsResponse = ItemController.browseRequestedItems(keyword);
+        Response<ArrayList<Item>> browseItemsResponse = currentController.browseRequestedItems(keyword);
 
         if (!browseItemsResponse.getIsSuccess()) {
             MainViewController.getInstance(null).showAlert(

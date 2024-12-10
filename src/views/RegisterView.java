@@ -16,13 +16,15 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
     // Constructor
 
     public RegisterView() {
+        this.currentController = new UserController();
+
         init();
         setLayout();
     }
 
     // Properties
 
-    // private UserController controller;
+    private UserController currentController;
 
     private Label titleLabel;
     private Label captionLabel;
@@ -130,7 +132,7 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
             String registerAddress = addressField.getText();
             String registerRole = sellerRadio.isSelected() ? "Seller" : "Buyer";
 
-            Response<User> registerResponse = UserController.register(registerUsername, registerPassword, registerPhone,
+            Response<User> registerResponse = currentController.register(registerUsername, registerPassword, registerPhone,
                 registerAddress,
                 registerRole);
 

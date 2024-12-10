@@ -20,6 +20,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
     // Constructor
 
     public AdminHomeSubview(User currentUser) {
+        this.itemController = new ItemController();
         this.currentUser = currentUser;
 
         init();
@@ -29,6 +30,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
 
     // Properties
 
+    private ItemController itemController;
     private User currentUser;
 
     private TableView<Item> itemsTable;
@@ -101,7 +103,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {
-            Response<ArrayList<Item>> requestedItemsResponse = ItemController.getRequestedItems();
+            Response<ArrayList<Item>> requestedItemsResponse = itemController.getRequestedItems();
 
             if (!requestedItemsResponse.getIsSuccess()) {
                 MainViewController.getInstance(null).showAlert(
@@ -143,7 +145,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
             return;
         }
 
-        Response<Item> approveItemResponse = ItemController.approveItem(item.getId());
+        Response<Item> approveItemResponse = itemController.approveItem(item.getId());
 
         MainViewController.getInstance(null).showAlert(
                 approveItemResponse.getIsSuccess(),
@@ -161,7 +163,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
             return;
         }
 
-        Response<Item> declineItemResponse = ItemController.declineItem(item.getId(), reasonField.getText());
+        Response<Item> declineItemResponse = itemController.declineItem(item.getId(), reasonField.getText());
 
         MainViewController.getInstance(null).showAlert(
                 declineItemResponse.getIsSuccess(),

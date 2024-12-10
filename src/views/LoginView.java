@@ -19,13 +19,15 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
     // Constructor
 
     public LoginView() {
+        this.currentController = new UserController();
+
         init();
         setLayout();
     }
 
     // Properties
 
-    // private UserController controller;
+    private UserController currentController;
 
     private Label titleLabel;
     private Label captionLabel;
@@ -104,7 +106,7 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
             String loginUsername = usernameField.getText();
             String loginPassword = passwordField.getText();
 
-            Response<User> loginResponse = UserController.login(loginUsername, loginPassword);
+            Response<User> loginResponse = currentController.login(loginUsername, loginPassword);
 
             MainViewController.getInstance(null).showAlert(loginResponse.getIsSuccess(),
                     "Log in", loginResponse.getMessage());

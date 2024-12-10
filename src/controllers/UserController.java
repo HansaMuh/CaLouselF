@@ -10,9 +10,19 @@ import java.sql.ResultSet;
 
 public class UserController {
 
+    // Constructor
+    
+    public UserController() {
+        database = Database.getInstance();
+    }
+
+    // Properties
+    
+    private Database database;
+
     // Methods
 
-    public static Response<User> login(String username, String password) {
+    public Response<User> login(String username, String password) {
         if (username.isEmpty() || password.isEmpty()) {
             return new Response<>(
                     false,
@@ -39,7 +49,7 @@ public class UserController {
 
         String query = "SELECT * FROM users WHERE username = ? AND password = ?;";
         try {
-            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+            PreparedStatement statement = database.prepareStatement(query);
 
             statement.setString(1, username);
             statement.setString(2, password);
@@ -79,7 +89,7 @@ public class UserController {
         );
     }
 
-    public static Response<User> register(String username, String password, String phoneNumber, String address,
+    public Response<User> register(String username, String password, String phoneNumber, String address,
                                           String role) {
         Response<String> validationResponse = checkAccountValidation(username, password, phoneNumber, address, role);
 
@@ -108,7 +118,7 @@ public class UserController {
 
         String query = "INSERT INTO users (id, username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?, ?);";
         try {
-            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+            PreparedStatement statement = database.prepareStatement(query);
 
             statement.setString(1, user.getId());
             statement.setString(2, user.getUsername());
@@ -117,7 +127,7 @@ public class UserController {
             statement.setString(5, user.getAddress());
             statement.setString(6, user.getRole().toString());
 
-            statement.execute();
+            statement.executeUpdate();
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -135,7 +145,7 @@ public class UserController {
         );
     }
 
-    public static Response<String> checkAccountValidation(String username, String password, String phoneNumber,
+    public Response<String> checkAccountValidation(String username, String password, String phoneNumber,
                                                           String address, String role) {
         String errorMessage = "";
 
@@ -160,12 +170,12 @@ public class UserController {
         }
     }
 
-    public static Response<String> checkLatestUserId() {
+    public Response<String> checkLatestUserId() {
         String userId = "UID0000";
 
         String query = "SELECT u.id FROM users AS u ORDER BY id DESC LIMIT 1;";
         try {
-            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+            PreparedStatement statement = database.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -189,7 +199,7 @@ public class UserController {
 
     // Validations
 
-    private static String validateUsername(String username) {
+    private String validateUsername(String username) {
         String errorMessage = "";
 
         if (username.isEmpty()) {
@@ -207,7 +217,7 @@ public class UserController {
         return errorMessage;
     }
 
-    private static String validatePassword(String password) {
+    private String validatePassword(String password) {
         String errorMessage = "";
 
         if (password.isEmpty()) {
@@ -225,7 +235,7 @@ public class UserController {
         return errorMessage;
     }
 
-    private static String validatePhoneNumber(String phoneNumber) {
+    private String validatePhoneNumber(String phoneNumber) {
         String errorMessage = "";
 
         if (!isValidPhoneNumber(phoneNumber)) {
@@ -235,7 +245,7 @@ public class UserController {
         return errorMessage;
     }
 
-    private static String validateAddress(String address) {
+    private String validateAddress(String address) {
         String errorMessage = "";
 
         if (address.isEmpty()) {
@@ -245,7 +255,7 @@ public class UserController {
         return errorMessage;
     }
 
-    private static String validateRole(String role) {
+    private String validateRole(String role) {
         String errorMessage = "";
 
         if (role == null || role.isEmpty()) {
@@ -255,11 +265,12 @@ public class UserController {
         return errorMessage;
     }
 
-    private static boolean isUsernameUnique(String username) {
+    private boolean isUsernameUnique(String username) {
         String query = "SELECT * FROM users WHERE username = ?;";
 
         try {
-            PreparedStatement statement = Database.getInstance().prepareStatement(query);
+            PreparedStatement statement = database.prepareStatement(query);
+
             statement.setString(1, username);
 
             ResultSet resultSet = statement.executeQuery();
@@ -273,7 +284,7 @@ public class UserController {
         return false;
     }
 
-    private static boolean containsSpecialCharacter(String password) {
+    private boolean containsSpecialCharacter(String password) {
         String specialChars = "!@#$%^&*";
 
         for (char c : password.toCharArray()) {
@@ -285,7 +296,7 @@ public class UserController {
         return false;
     }
 
-    private static boolean isValidPhoneNumber(String phone) {
+    private boolean isValidPhoneNumber(String phone) {
         if (!phone.startsWith("+62") || phone.length() < 10) {
             return false;
         }

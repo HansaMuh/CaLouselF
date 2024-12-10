@@ -1,5 +1,7 @@
 package controllers;
 
+// Unused
+
 //File: controllers/BuyerController.java
 
 import singleton.Database;
