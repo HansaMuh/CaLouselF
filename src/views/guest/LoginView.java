@@ -1,4 +1,4 @@
-package views;
+package views.guest;
 
 import controllers.UserController;
 import javafx.event.ActionEvent;
@@ -12,22 +12,25 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import models.User;
 import modules.Response;
+import singleton.UserAuthenticator;
 import view_controllers.MainViewController;
+import views.HomeView;
 
 public class LoginView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
 
     public LoginView() {
-        this.currentController = new UserController();
+        this.userController = new UserController();
 
         init();
         setLayout();
+        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
     }
 
     // Properties
 
-    private UserController currentController;
+    private UserController userController;
 
     private Label titleLabel;
     private Label captionLabel;
@@ -96,28 +99,39 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
         getChildren().addAll(titleLabel, captionLabel, formGrid, buttonGrid);
     }
 
+    private void setStyling() {
+        // TODO: Implement styling
+    }
+
+    // Helpers
+
+    private void login() {
+        String loginUsername = usernameField.getText();
+        String loginPassword = passwordField.getText();
+
+        Response<User> loginResponse = userController.login(loginUsername, loginPassword);
+
+        MainViewController.getInstance(null).showAlert(
+                loginResponse.getIsSuccess(),
+                loginResponse.getIsSuccess() ? "Success" : "Error",
+                loginResponse.getMessage());
+
+        if (loginResponse.getIsSuccess()) {
+            UserAuthenticator.getInstance().setCurrentUser(loginResponse.getOutput());
+            MainViewController.getInstance(null).navigateTo(HomeView.class);
+        }
+    }
+
     // Overrides
 
     @Override
     public void handle(ActionEvent evt)
     {
-        if (evt.getSource() == loginButton)
-        {
-            String loginUsername = usernameField.getText();
-            String loginPassword = passwordField.getText();
-
-            Response<User> loginResponse = currentController.login(loginUsername, loginPassword);
-
-            MainViewController.getInstance(null).showAlert(loginResponse.getIsSuccess(),
-                    "Log in", loginResponse.getMessage());
-
-            if (loginResponse.getIsSuccess()) {
-                MainViewController.getInstance(null).navigateToHome(loginResponse.getOutput());
-            }
+        if (evt.getSource() == loginButton) {
+            login();
         }
-        else if (evt.getSource() == navigateToRegisterButton)
-        {
-            MainViewController.getInstance(null).navigateToRegister();
+        else if (evt.getSource() == navigateToRegisterButton) {
+            MainViewController.getInstance(null).navigateTo(RegisterView.class);
         }
     }
 

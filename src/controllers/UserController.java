@@ -57,10 +57,7 @@ public class UserController {
         String query = "SELECT * FROM users WHERE username = ? AND password = ?;";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, username);
-            statement.setString(2, password);
+            PreparedStatement statement = database.prepareStatement(query, username, password);
 
             ResultSet resultSet = statement.executeQuery();
             user = getUsersFromResultSet(resultSet).get(0);
@@ -102,14 +99,7 @@ public class UserController {
         String targetRole = role.toUpperCase();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, id);
-            statement.setString(2, username);
-            statement.setString(3, password);
-            statement.setString(4, phoneNumber);
-            statement.setString(5, address);
-            statement.setString(6, targetRole);
+            PreparedStatement statement = database.prepareStatement(query, id, username, password, phoneNumber, address, targetRole);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -282,9 +272,7 @@ public class UserController {
         String query = "SELECT * FROM users WHERE username = ?;";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, username);
+            PreparedStatement statement = database.prepareStatement(query, username);
 
             ResultSet resultSet = statement.executeQuery();
             return !resultSet.next();

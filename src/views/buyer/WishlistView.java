@@ -1,4 +1,4 @@
-package views;
+package views.buyer;
 
 import controllers.WishlistController;
 import javafx.event.ActionEvent;
@@ -14,8 +14,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Item;
 import models.User;
-import models.Wishlist;
 import modules.Response;
+import singleton.UserAuthenticator;
 import view_controllers.MainViewController;
 
 import java.util.ArrayList;
@@ -24,18 +24,19 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
 
-    public WishlistView(User currentUser) {
-        this.currentController = new WishlistController();
-        this.currentUser = currentUser;
+    public WishlistView() {
+        this.wishlistController = new WishlistController();
+        this.currentUser = UserAuthenticator.getInstance().getCurrentUser();
 
         init();
         setLayout();
         setTable();
+        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
     }
 
     // Properties
 
-    private WishlistController currentController;
+    private WishlistController wishlistController;
     private User currentUser;
 
     private BorderPane dashboardPane;
@@ -98,9 +99,13 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
         refreshTableContent(null);
     }
 
+    private void setStyling() {
+        // TODO: Implement styling
+    }
+
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {
-            Response<ArrayList<Item>> wishlistedItemsResponse = currentController.getWishlistedItems(currentUser.getId());
+            Response<ArrayList<Item>> wishlistedItemsResponse = wishlistController.getWishlistedItems(currentUser.getId());
 
             if (!wishlistedItemsResponse.getIsSuccess()) {
                 MainViewController.getInstance(null).showAlert(
@@ -142,7 +147,7 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
             return;
         }
 
-        Response<Integer> removeWishlistResponse = currentController.removeWishlistsByUser(item.getId(), currentUser.getId());
+        Response<Integer> removeWishlistResponse = wishlistController.removeWishlistsByUser(item.getId(), currentUser.getId());
 
         MainViewController.getInstance(null).showAlert(
                 removeWishlistResponse.getIsSuccess(),

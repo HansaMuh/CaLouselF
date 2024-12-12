@@ -33,10 +33,7 @@ public class ItemController {
         String keywordPattern = "%" + keyword.toLowerCase() + "%";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
-            statement.setString(2, keywordPattern);
+            PreparedStatement statement = database.prepareStatement(query, status, keywordPattern);
 
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getItemsFromResultSet(resultSet));
@@ -67,10 +64,7 @@ public class ItemController {
         String keywordPattern = "%" + keyword.toLowerCase() + "%";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
-            statement.setString(2, keywordPattern);
+            PreparedStatement statement = database.prepareStatement(query, status, keywordPattern);
 
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getItemsFromResultSet(resultSet));
@@ -101,9 +95,7 @@ public class ItemController {
         String status = ItemStatus.APPROVED.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
+            PreparedStatement statement = database.prepareStatement(query, status);
 
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getItemsFromResultSet(resultSet));
@@ -133,9 +125,7 @@ public class ItemController {
         String status = ItemStatus.PENDING.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
+            PreparedStatement statement = database.prepareStatement(query, status);
 
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getItemsFromResultSet(resultSet));
@@ -152,6 +142,34 @@ public class ItemController {
         return new Response<>(
                 true,
                 "Requested items retrieved successfully.",
+                items
+        );
+    }
+
+    public Response<ArrayList<Item>> getSellerItems(String sellerId) {
+        ArrayList<Item> items = new ArrayList<>();
+
+        String query = "SELECT * FROM items WHERE seller_id = ? AND NOT status = ?;";
+        String status = ItemStatus.INVALID.toString();
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query, sellerId, status);
+
+            ResultSet resultSet = statement.executeQuery();
+            items.addAll(getItemsFromResultSet(resultSet));
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to get seller items:\r\n- " + ex.getMessage(),
+                    items
+            );
+        }
+
+        return new Response<>(
+                true,
+                "Seller items retrieved successfully.",
                 items
         );
     }
@@ -175,18 +193,11 @@ public class ItemController {
         String query = "INSERT INTO items (id, seller_id, name, size, price, category, status, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         String id = String.format("IID%04d", latestId + 1);
         double priceNumber = Double.parseDouble(price);
+        String status = ItemStatus.PENDING.toString();
+        String note = "";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, id);
-            statement.setString(2, sellerId);
-            statement.setString(3, name);
-            statement.setString(4, size);
-            statement.setDouble(5, priceNumber);
-            statement.setString(6, category);
-            statement.setString(7, ItemStatus.PENDING.toString());
-            statement.setString(8, "");
+            PreparedStatement statement = database.prepareStatement(query, id, sellerId, name, size, priceNumber, category, status, note);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -224,13 +235,7 @@ public class ItemController {
         double priceNumber = Double.parseDouble(price);
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, name);
-            statement.setString(2, size);
-            statement.setDouble(3, priceNumber);
-            statement.setString(4, category);
-            statement.setString(5, id);
+            PreparedStatement statement = database.prepareStatement(query, name, size, priceNumber, category, id);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -258,10 +263,7 @@ public class ItemController {
         String status = ItemStatus.SOLD_OUT.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
-            statement.setString(2, id);
+            PreparedStatement statement = database.prepareStatement(query, status, id);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -286,12 +288,10 @@ public class ItemController {
 
         // Turn the item's status to INVALID
         String query = "UPDATE items SET status = ? WHERE id = ?;";
+        String status = ItemStatus.INVALID.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, ItemStatus.INVALID.toString());
-            statement.setString(2, id);
+            PreparedStatement statement = database.prepareStatement(query, status, id);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -320,10 +320,7 @@ public class ItemController {
         String status = ItemStatus.APPROVED.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
-            statement.setString(2, id);
+            PreparedStatement statement = database.prepareStatement(query, status, id);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -360,11 +357,7 @@ public class ItemController {
         String status = ItemStatus.DECLINED.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
-            statement.setString(2, reason);
-            statement.setString(3, id);
+            PreparedStatement statement = database.prepareStatement(query, status, reason, id);
 
             rowsAffected = statement.executeUpdate();
         }

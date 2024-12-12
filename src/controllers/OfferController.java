@@ -36,10 +36,7 @@ public class OfferController {
         String status = OfferStatus.PENDING.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
-            statement.setString(2, sellerId);
+            PreparedStatement statement = database.prepareStatement(query, status, sellerId);
 
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getOfferedItemsFromResultSet(resultSet));
@@ -89,17 +86,10 @@ public class OfferController {
         String id = String.format("OID%04d", latestId + 1);
         Date date = new Date(Calendar.getInstance().getTime().getTime());
         String status = OfferStatus.PENDING.toString();
+        String reason = "";
 
         try {
-            PreparedStatement statement = database.prepareStatement(offerQuery);
-
-            statement.setString(1, id);
-            statement.setString(2, userId);
-            statement.setString(3, itemId);
-            statement.setDouble(4, priceNumber);
-            statement.setDate(5, date);
-            statement.setString(6, status);
-            statement.setString(7, "");
+            PreparedStatement statement = database.prepareStatement(offerQuery, id, userId, itemId, priceNumber, date, status, reason);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -126,10 +116,7 @@ public class OfferController {
         String status = OfferStatus.ACCEPTED.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
-            statement.setString(2, id);
+            PreparedStatement statement = database.prepareStatement(query, status, id);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -177,11 +164,7 @@ public class OfferController {
         String status = OfferStatus.DECLINED.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, status);
-            statement.setString(2, reason);
-            statement.setString(3, id);
+            PreparedStatement statement = database.prepareStatement(query, status, reason, id);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -238,9 +221,7 @@ public class OfferController {
         String query = "SELECT * FROM offers WHERE item_id = ? ORDER BY price DESC LIMIT 1;";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, itemId);
+            PreparedStatement statement = database.prepareStatement(query, itemId);
 
             ResultSet resultSet = statement.executeQuery();
 
@@ -269,9 +250,7 @@ public class OfferController {
         String query = "SELECT * FROM items WHERE id = ?;";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, itemId);
+            PreparedStatement statement = database.prepareStatement(query, itemId);
 
             ResultSet resultSet = statement.executeQuery();
 

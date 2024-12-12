@@ -1,6 +1,8 @@
 package views.subviews;
 
 import controllers.ItemController;
+import controllers.OfferController;
+import controllers.TransactionController;
 import controllers.WishlistController;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -16,8 +18,11 @@ import models.Item;
 import models.User;
 import models.Wishlist;
 import modules.Response;
+import singleton.UserAuthenticator;
 import view_controllers.MainViewController;
 import views.HomeView;
+import views.buyer.PurchaseHistoryView;
+import views.buyer.WishlistView;
 
 import java.util.ArrayList;
 
@@ -25,23 +30,26 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
 
     // Constructor
 
-    public BuyerHomeSubview(User currentUser) {
+    public BuyerHomeSubview() {
         this.itemController = new ItemController();
         this.wishlistController = new WishlistController();
-        this.currentUser = currentUser;
+        this.transactionController = new TransactionController();
+        this.offerController = new OfferController();
+        this.currentUser = UserAuthenticator.getInstance().getCurrentUser();
 
         init();
         setLayout();
         setTable();
+        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
     }
 
     // Properties
 
     private ItemController itemController;
     private WishlistController wishlistController;
+    private TransactionController transactionController;
+    private OfferController offerController;
     private User currentUser;
-
-    private HomeView parentView;
 
     private TableView<Item> itemsTable;
 
@@ -122,6 +130,10 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
         refreshTableContent(null);
     }
 
+    private void setStyling() {
+        // TODO: Implement styling
+    }
+
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {
             Response<ArrayList<Item>> availableItemsResponse = itemController.getAvailableItems();
@@ -173,6 +185,49 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
                 addToWishlistResponse.getIsSuccess() ? "Success" : "Error",
                 addToWishlistResponse.getMessage()
         );
+
+        refreshTableContent(null);
+    }
+
+    private void purchaseItem() {
+        Item item = getSelectedItem();
+
+        if (item == null) {
+            return;
+        }
+
+        Response<Integer> purchaseResponse = transactionController.purchaseItem(currentUser.getId(), item.getId());
+
+        MainViewController.getInstance(null).showAlert(
+                purchaseResponse.getIsSuccess(),
+                purchaseResponse.getIsSuccess() ? "Success" : "Error",
+                purchaseResponse.getMessage()
+        );
+
+        refreshTableContent(null);
+    }
+
+    private void makeOffer() {
+        Item item = getSelectedItem();
+
+        if (item == null) {
+            return;
+        }
+
+        String offeredPrice = offerField.getText();
+        Response<Integer> makeOfferResponse = offerController.makeOffer(currentUser.getId(), item.getId(), offeredPrice);
+
+        MainViewController.getInstance(null).showAlert(
+                makeOfferResponse.getIsSuccess(),
+                makeOfferResponse.getIsSuccess() ? "Success" : "Error",
+                makeOfferResponse.getMessage()
+        );
+
+        if (makeOfferResponse.getIsSuccess()) {
+            offerField.setText("");
+        }
+
+        refreshTableContent(null);
     }
 
     // Overrides
@@ -183,16 +238,16 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
             addToWishlist();
         }
         else if (evt.getSource() == purchaseButton) {
-            // TODO: Purchase item
+            purchaseItem();
         }
         else if (evt.getSource() == makeOfferButton) {
-            // TODO: Make an offer
+            makeOffer();
         }
         else if (evt.getSource() == viewWishlistButton) {
-            MainViewController.getInstance(null).navigateToWishlist(currentUser);
+            MainViewController.getInstance(null).navigateTo(WishlistView.class);
         }
         else if (evt.getSource() == viewPurchaseHistoryButton) {
-            MainViewController.getInstance(null).navigateToPurchaseHistory(currentUser);
+            MainViewController.getInstance(null).navigateTo(PurchaseHistoryView.class);
         }
     }
 

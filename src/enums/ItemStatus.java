@@ -5,5 +5,6 @@ public enum ItemStatus {
     APPROVED,
     DECLINED,
     SOLD_OUT,
+
     INVALID
 }

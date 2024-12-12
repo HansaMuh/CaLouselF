@@ -32,9 +32,7 @@ public class WishlistController {
         String query = "SELECT i.* FROM wishlists AS w LEFT JOIN items AS i ON w.item_id = i.id WHERE w.user_id = ?;";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, userId);
+            PreparedStatement statement = database.prepareStatement(query, userId);
 
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getItemsFromResultSet(resultSet));
@@ -66,12 +64,7 @@ public class WishlistController {
         Date date = new Date(Calendar.getInstance().getTime().getTime());
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, id);
-            statement.setString(2, itemId);
-            statement.setString(3, userId);
-            statement.setDate(4, date);
+            PreparedStatement statement = database.prepareStatement(query, id, itemId, userId, date);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -97,9 +90,7 @@ public class WishlistController {
         String query = "DELETE FROM wishlists WHERE item_id = ?;";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, itemId);
+            PreparedStatement statement = database.prepareStatement(query, itemId);
 
             rowsAffected = statement.executeUpdate();
         }
@@ -125,10 +116,7 @@ public class WishlistController {
         String query = "DELETE FROM wishlists WHERE item_id = ? AND user_id = ?;";
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, itemId);
-            statement.setString(2, userId);
+            PreparedStatement statement = database.prepareStatement(query, itemId, userId);
 
             rowsAffected = statement.executeUpdate();
         }

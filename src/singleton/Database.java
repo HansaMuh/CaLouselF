@@ -35,30 +35,41 @@ public class Database {
 
     public static Database getInstance() {
         if (instance == null) {
-            instance = new Database();
+            synchronized (Database.class) {
+                if (instance == null) {
+                    instance = new Database();
+                }
+            }
         }
 
         return instance;
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
     // Methods
 
-    public PreparedStatement prepareStatement(String query)
+    public PreparedStatement prepareStatement(String query, Object... values)
     {
+        PreparedStatement statement = null;
+
         try
         {
-            return connection.prepareStatement(query);
+            statement = connection.prepareStatement(query);
+
+            int index = 1;
+            for (Object val : values) {
+                statement.setObject(index++, val);
+            }
         }
         catch (Exception ex)
         {
             ex.printStackTrace();
         }
 
-        return null;
-    }
-
-    public static Connection getConnection() {
-        return instance.connection;
+        return statement;
     }
 
 }

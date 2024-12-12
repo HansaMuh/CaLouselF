@@ -3,6 +3,7 @@ package main;
 import view_controllers.MainViewController;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import views.guest.LoginView;
 
 public class Main extends Application {
 
@@ -20,10 +21,11 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        primaryStage.setTitle("CaLouselF");
+        this.primaryStage.setWidth(450);
+        this.primaryStage.setHeight(300);
 
         MainViewController viewController = MainViewController.getInstance(primaryStage);
-        viewController.navigateToLogin();
+        viewController.navigateTo(LoginView.class);
     }
 
 }

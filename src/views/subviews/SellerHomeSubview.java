@@ -12,9 +12,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import models.Item;
-import models.User;
 import modules.Response;
 import view_controllers.MainViewController;
+import views.seller.OffersView;
+import views.seller.SellerItemsView;
 
 import java.util.ArrayList;
 
@@ -22,19 +23,26 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
 
     // Constructor
 
-    public SellerHomeSubview(User currentUser) {
+    public SellerHomeSubview() {
         this.itemController = new ItemController();
-        this.currentUser = currentUser;
 
         init();
         setLayout();
         setTable();
+        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
+
+        // Check if the view gets added back to a container by adding an event listener
+        // to the view's parent property
+        parentProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                refreshTableContent(null);
+            }
+        });
     }
 
     // Properties
 
     private ItemController itemController;
-    private User currentUser;
 
     private TableView<Item> itemsTable;
 
@@ -89,6 +97,10 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
         refreshTableContent(null);
     }
 
+    private void setStyling() {
+        // TODO: Implement styling
+    }
+
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {
             Response<ArrayList<Item>> availableItemsResponse = itemController.getAvailableItems();
@@ -114,10 +126,10 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
     @Override
     public void handle(ActionEvent evt) {
         if (evt.getSource() == viewOffersButton) {
-            // TODO: Show offers
+            MainViewController.getInstance(null).navigateTo(OffersView.class);
         }
         else if (evt.getSource() == viewItemsButton) {
-            // TODO: Show seller's items
+            MainViewController.getInstance(null).navigateTo(SellerItemsView.class);
         }
     }
 

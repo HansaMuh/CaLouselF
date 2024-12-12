@@ -4,18 +4,18 @@ Developed with Java and MySQL, CaLouselF is a marketplace application specifical
 ## Feature Checklist
 - [x] Register
 - [x] Login
-- [ ] Upload Item
-- [ ] Edit Item
-- [ ] Delete Item
+- [x] Upload Item
+- [x] Edit Item
+- [x] Delete Item
 - [x] View Item
-- [ ] Purchase Item
-- [ ] Make Offer
+- [x] Purchase Item
+- [x] Make Offer
 - [x] View Requested Item
 - [x] Approve Item
 - [x] Decline Item
-- [ ] View Offered Item
-- [ ] Accept Offer
-- [ ] Decline Offer
+- [x] View Offered Item
+- [x] Accept Offer
+- [x] Decline Offer
 - [x] Add Item to Wishlist
 - [x] View Wishlist
 - [x] Remove Item from Wishlist

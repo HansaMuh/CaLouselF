@@ -1,4 +1,4 @@
-package views;
+package views.guest;
 
 import controllers.UserController;
 import javafx.event.ActionEvent;
@@ -7,7 +7,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import models.User;
 import modules.Response;
 import view_controllers.MainViewController;
 
@@ -16,7 +15,7 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
     // Constructor
 
     public RegisterView() {
-        this.currentController = new UserController();
+        this.userController = new UserController();
 
         init();
         setLayout();
@@ -24,7 +23,7 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
 
     // Properties
 
-    private UserController currentController;
+    private UserController userController;
 
     private Label titleLabel;
     private Label captionLabel;
@@ -119,6 +118,27 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
         getChildren().addAll(titleLabel, captionLabel, formGrid, buttonGrid);
     }
 
+    // Helpers
+
+    private void register() {
+        String registerUsername = usernameField.getText();
+        String registerPassword = passwordField.getText();
+        String registerPhone = phoneField.getText();
+        String registerAddress = addressField.getText();
+        String registerRole = sellerRadio.isSelected() ? "Seller" : "Buyer";
+
+        Response<Integer> registerResponse = userController.register(registerUsername, registerPassword, registerPhone,
+                registerAddress,
+                registerRole);
+
+        MainViewController.getInstance(null).showAlert(registerResponse.getIsSuccess(),
+                "Register account", registerResponse.getMessage());
+
+        if (registerResponse.getIsSuccess()) {
+            MainViewController.getInstance(null).navigateBack();
+        }
+    }
+
     // Overrides
 
     @Override
@@ -126,22 +146,7 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
     {
         if (evt.getSource() == registerButton)
         {
-            String registerUsername = usernameField.getText();
-            String registerPassword = passwordField.getText();
-            String registerPhone = phoneField.getText();
-            String registerAddress = addressField.getText();
-            String registerRole = sellerRadio.isSelected() ? "Seller" : "Buyer";
-
-            Response<Integer> registerResponse = currentController.register(registerUsername, registerPassword, registerPhone,
-                registerAddress,
-                registerRole);
-
-            MainViewController.getInstance(null).showAlert(registerResponse.getIsSuccess(),
-             "Register account", registerResponse.getMessage());
-
-            if (registerResponse.getIsSuccess()) {
-                MainViewController.getInstance(null).navigateBack();
-            }
+            register();
         }
     }
 

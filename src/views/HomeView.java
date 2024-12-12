@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import models.Item;
 import models.User;
 import modules.Response;
+import singleton.UserAuthenticator;
 import view_controllers.MainViewController;
 import views.subviews.AdminHomeSubview;
 import views.subviews.BuyerHomeSubview;
@@ -24,12 +25,13 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
 
-    public HomeView(User currentUser) {
+    public HomeView() {
         this.currentController = new ItemController();
-        this.currentUser = currentUser;
+        this.currentUser = UserAuthenticator.getInstance().getCurrentUser();
 
         init();
         setLayout();
+        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
     }
 
     // Properties
@@ -54,14 +56,14 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
     private void init() {
         switch (currentUser.getRole()) {
             case SELLER:
-                currentSubview = new SellerHomeSubview(currentUser);
+                currentSubview = new SellerHomeSubview();
                 break;
             case BUYER:
-                currentSubview = new BuyerHomeSubview(currentUser);
+                currentSubview = new BuyerHomeSubview();
                 break;
 
             case ADMIN:
-                currentSubview = new AdminHomeSubview(currentUser);
+                currentSubview = new AdminHomeSubview();
                 break;
         }
 
@@ -101,6 +103,12 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
 
         getChildren().addAll(topLevelMenu, titleLabel, dashboardPane, currentSubview);
     }
+
+    private void setStyling() {
+        // TODO: Implement styling
+    }
+
+    // Helpers
 
     private void browseAvailableItems() {
         String keyword = browseField.getText();

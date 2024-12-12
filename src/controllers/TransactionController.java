@@ -33,9 +33,7 @@ public class TransactionController {
 
         String query = "SELECT t.id AS transaction_id, i.* FROM transactions AS t LEFT JOIN items AS i ON t.item_id = i.id WHERE t.user_id = ?;";
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, userId);
+            PreparedStatement statement = database.prepareStatement(query, userId);
 
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getTransactionalItemsFromResultSet(resultSet));
@@ -67,12 +65,7 @@ public class TransactionController {
         Date date = new Date(Calendar.getInstance().getTime().getTime());
 
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, id);
-            statement.setString(2, userId);
-            statement.setString(3, itemId);
-            statement.setDate(4, date);
+            PreparedStatement statement = database.prepareStatement(query, id, userId, itemId, date);
 
             rowsAffected = statement.executeUpdate();
         }

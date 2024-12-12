@@ -3,9 +3,18 @@ package view_controllers;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import models.User;
+import modules.ViewInfo;
 import views.*;
+import views.buyer.PurchaseHistoryView;
+import views.buyer.WishlistView;
+import views.guest.LoginView;
+import views.guest.RegisterView;
+import views.seller.ItemEditorView;
+import views.seller.ItemUploaderView;
+import views.seller.OffersView;
+import views.seller.SellerItemsView;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 public class MainViewController {
@@ -16,17 +25,28 @@ public class MainViewController {
         this.stage = stage;
 
         init();
+        setViews();
     }
 
-    // Static Fields
+    // Fields
 
     private static MainViewController instance;
+
+    private final double DEFAULT_WIDTH = 800;
+    private final double DEFAULT_HEIGHT = 600;
+    private final double LOGIN_WIDTH = 450;
+    private final double LOGIN_HEIGHT = 300;
+    private final double FORM_VIEW_WIDTH = 450;
+    private final double FORM_VIEW_HEIGHT = 450;
+    private final double TABLE_VIEW_WIDTH = 825;
+    private final double TABLE_VIEW_HEIGHT = 675;
 
     // Properties
 
     private Stage stage;
     private MainView mainView;
     private Stack<VBox> pages;
+    private HashMap<Class, ViewInfo> viewMap;
 
     // Getters
 
@@ -43,6 +63,19 @@ public class MainViewController {
     private void init() {
         mainView = new MainView(stage);
         pages = new Stack<>();
+        viewMap = new HashMap<>();
+    }
+
+    private void setViews() {
+        viewMap.put(LoginView.class, new ViewInfo("Log In", LOGIN_WIDTH, LOGIN_HEIGHT, false));
+        viewMap.put(RegisterView.class, new ViewInfo("Register Account", FORM_VIEW_WIDTH, FORM_VIEW_HEIGHT, true));
+        viewMap.put(HomeView.class, new ViewInfo("Home", TABLE_VIEW_WIDTH, TABLE_VIEW_HEIGHT, false));
+        viewMap.put(WishlistView.class, new ViewInfo("Wishlist", TABLE_VIEW_WIDTH, TABLE_VIEW_HEIGHT, true));
+        viewMap.put(PurchaseHistoryView.class, new ViewInfo("Purchase History", TABLE_VIEW_WIDTH, TABLE_VIEW_HEIGHT, true));
+        viewMap.put(ItemEditorView.class, new ViewInfo("Item Editor", FORM_VIEW_WIDTH, FORM_VIEW_HEIGHT, true));
+        viewMap.put(ItemUploaderView.class, new ViewInfo("Item Uploader", FORM_VIEW_WIDTH, FORM_VIEW_HEIGHT, true));
+        viewMap.put(OffersView.class, new ViewInfo("Offers", TABLE_VIEW_WIDTH, TABLE_VIEW_HEIGHT, true));
+        viewMap.put(SellerItemsView.class, new ViewInfo("My Items", TABLE_VIEW_WIDTH, TABLE_VIEW_HEIGHT, true));
     }
 
     // Helper
@@ -52,47 +85,23 @@ public class MainViewController {
     }
 
     private void refresh() {
-        if (pages.lastElement() instanceof LoginView) {
-            stage.setTitle("Log in | CaLouselF");
-            stage.setWidth(450);
-            stage.setHeight(300);
+        ViewInfo info = viewMap.get(pages.lastElement().getClass());
 
-            mainView.setTopLevelBorder(false);
-        }
-        else if (pages.lastElement() instanceof RegisterView) {
-            stage.setTitle("Register account | CaLouselF");
-            stage.setWidth(450);
-            stage.setHeight(450);
+        if (info != null) {
+            stage.setTitle(info.getName() + " | CaLouselF");
+            stage.setWidth(info.getWidth());
+            stage.setHeight(info.getHeight());
 
-            mainView.setTopLevelBorder(true);
-        }
-        else if (pages.lastElement() instanceof HomeView) {
-            stage.setTitle("Home | CaLouselF");
-            stage.setWidth(825);
-            stage.setHeight(675);
-
-            mainView.setTopLevelBorder(false);
-        }
-        else if (pages.lastElement() instanceof WishlistView) {
-            stage.setTitle("Wishlist | CaLouselF");
-            stage.setWidth(825);
-            stage.setHeight(675);
-
-            mainView.setTopLevelBorder(true);
-        }
-        else if (pages.lastElement() instanceof PurchaseHistoryView) {
-            stage.setTitle("Purchase History | CaLouselF");
-            stage.setWidth(825);
-            stage.setHeight(675);
-
-            mainView.setTopLevelBorder(true);
+            mainView.setTopLevelBorder(info.isBottomLevel());
         }
         else {
             stage.setTitle("CaLouselF");
-            stage.setWidth(800);
-            stage.setHeight(600);
+            stage.setWidth(DEFAULT_WIDTH);
+            stage.setHeight(DEFAULT_HEIGHT);
         }
     }
+
+    // Methods
 
     public void showAlert(boolean isSuccess, String title, String message) {
         Alert.AlertType alertType = isSuccess ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR;
@@ -105,8 +114,6 @@ public class MainViewController {
         alert.showAndWait();
     }
 
-    // Methods
-
     public void navigateBack() {
         if (isViewMultilayered()) {
             pages.pop();
@@ -116,50 +123,38 @@ public class MainViewController {
         refresh();
     }
 
-    public void navigateToLogin() {
-        LoginView view = new LoginView();
-        pages.add(view);
+    public void navigateTo(Class<? extends VBox> viewClass, Object... args) {
+        try {
+            VBox view = null;
 
-        mainView.getContainer().setCenter(view);
+            if (args.length == 0) {
+                // Constructor without args
+                view = viewClass.getDeclaredConstructor().newInstance();
+            }
+            else {
+                // Constructor with args
+                Class<?>[] argTypes = new Class[args.length];
 
-        refresh();
-        stage.centerOnScreen();
-    }
+                for (int i = 0; i < args.length; i++) {
+                    argTypes[i] = args[i].getClass();
+                }
 
-    public void navigateToRegister() {
-        RegisterView view = new RegisterView();
-        pages.add(view);
+                view = viewClass.getDeclaredConstructor(argTypes).newInstance(args);
+            }
 
-        mainView.getContainer().setCenter(view);
+            pages.add(view);
+            mainView.getContainer().setCenter(view);
 
-        refresh();
-    }
-
-    public void navigateToHome(User user) {
-        HomeView view = new HomeView(user);
-        pages.add(view);
-
-        mainView.getContainer().setCenter(view);
-
-        refresh();
-    }
-
-    public void navigateToWishlist(User user) {
-        WishlistView view = new WishlistView(user);
-        pages.add(view);
-
-        mainView.getContainer().setCenter(view);
-
-        refresh();
-    }
-
-    public void navigateToPurchaseHistory(User user) {
-        PurchaseHistoryView view = new PurchaseHistoryView(user);
-        pages.add(view);
-
-        mainView.getContainer().setCenter(view);
-
-        refresh();
+            refresh();
+            stage.centerOnScreen();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert(
+                    false,
+                    "Navigation Error",
+                    "Failed to navigate to the view:\r\n" + ex.getMessage());
+        }
     }
 
 }

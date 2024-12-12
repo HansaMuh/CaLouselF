@@ -1,4 +1,4 @@
-package views;
+package views.buyer;
 
 import controllers.TransactionController;
 import javafx.event.ActionEvent;
@@ -11,10 +11,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import models.Item;
 import models.TransactionalItem;
 import models.User;
 import modules.Response;
+import singleton.UserAuthenticator;
 import view_controllers.MainViewController;
 
 import java.util.ArrayList;
@@ -23,18 +23,19 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
 
     // Constructor
 
-    public PurchaseHistoryView(User currentUser) {
-        this.currentController = new TransactionController();
-        this.currentUser = currentUser;
+    public PurchaseHistoryView() {
+        this.transactionController = new TransactionController();
+        this.currentUser = UserAuthenticator.getInstance().getCurrentUser();
 
         init();
         setLayout();
         setTable();
+        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
     }
 
     // Properties
 
-    private TransactionController currentController;
+    private TransactionController transactionController;
     private User currentUser;
 
     private BorderPane dashboardPane;
@@ -94,10 +95,14 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
         refreshTableContent(null);
     }
 
+    private void setStyling() {
+        // TODO: Implement styling
+    }
+
     public void refreshTableContent(ArrayList<TransactionalItem> items) {
         if (items == null) {
             Response<ArrayList<TransactionalItem>> transactionalItemsResponse =
-                    currentController.getItemsByTransaction(currentUser.getId());
+                    transactionController.getItemsByTransaction(currentUser.getId());
 
             if (!transactionalItemsResponse.getIsSuccess()) {
                 MainViewController.getInstance(null).showAlert(

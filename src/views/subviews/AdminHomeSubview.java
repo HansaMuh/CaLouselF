@@ -9,7 +9,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Item;
-import models.User;
 import modules.Response;
 import view_controllers.MainViewController;
 
@@ -19,19 +18,18 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
 
     // Constructor
 
-    public AdminHomeSubview(User currentUser) {
+    public AdminHomeSubview() {
         this.itemController = new ItemController();
-        this.currentUser = currentUser;
 
         init();
         setLayout();
         setTable();
+        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
     }
 
     // Properties
 
     private ItemController itemController;
-    private User currentUser;
 
     private TableView<Item> itemsTable;
 
@@ -99,6 +97,10 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
         itemsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         refreshTableContent(null);
+    }
+
+    private void setStyling() {
+        // TODO: Implement styling
     }
 
     public void refreshTableContent(ArrayList<Item> items) {
@@ -171,7 +173,10 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
                 declineItemResponse.getMessage()
         );
 
-        reasonField.setText("");
+        if (declineItemResponse.getIsSuccess()) {
+            reasonField.setText("");
+        }
+
         refreshTableContent(null);
     }
 

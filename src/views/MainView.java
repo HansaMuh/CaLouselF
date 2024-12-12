@@ -14,6 +14,7 @@ public class MainView {
     public MainView(Stage stage) {
         init();
         setLayout();
+        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
 
         Scene scene = new Scene(viewBorder, 600, 600);
         stage.setScene(scene);
@@ -27,7 +28,7 @@ public class MainView {
 
     private Button backButton;
 
-    // Utilities
+    // Methods
 
     private void init() {
         viewBorder = new BorderPane();
@@ -43,6 +44,12 @@ public class MainView {
         setTopLevelBorder(false);
         topLevelBorder.setLeft(backButton);
     }
+
+    private void setStyling() {
+        // TODO: Implement styling
+    }
+
+    // Helpers
 
     public void setTopLevelBorder(boolean isActive) {
         if (isActive) {
