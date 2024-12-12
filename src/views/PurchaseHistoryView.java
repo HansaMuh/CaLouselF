@@ -12,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Item;
+import models.TransactionalItem;
 import models.User;
 import modules.Response;
 import view_controllers.MainViewController;
@@ -42,7 +43,7 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
     private Label titleLabel;
     private Label captionLabel;
 
-    private TableView<Item> transactionalItemsTable;
+    private TableView<TransactionalItem> transactionalItemsTable;
 
     // Methods
 
@@ -72,17 +73,17 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
     }
 
     private void setTable() {
-        TableColumn<Item, String> transactionIdColumn = new TableColumn<>("Transaction ID");
-        TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
-        TableColumn<Item, String> categoryColumn = new TableColumn<>("Category");
-        TableColumn<Item, String> sizeColumn = new TableColumn<>("Size");
-        TableColumn<Item, Double> priceColumn = new TableColumn<>("Price (IDR)");
+        TableColumn<TransactionalItem, String> transactionIdColumn = new TableColumn<>("Transaction ID");
+        TableColumn<TransactionalItem, String> nameColumn = new TableColumn<>("Name");
+        TableColumn<TransactionalItem, String> categoryColumn = new TableColumn<>("Category");
+        TableColumn<TransactionalItem, String> sizeColumn = new TableColumn<>("Size");
+        TableColumn<TransactionalItem, Double> priceColumn = new TableColumn<>("Price (IDR)");
 
-        transactionIdColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("id"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("name"));
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("category"));
-        sizeColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("size"));
-        priceColumn.setCellValueFactory(new PropertyValueFactory<Item, Double>("price"));
+        transactionIdColumn.setCellValueFactory(new PropertyValueFactory<TransactionalItem, String>("transactionId"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<TransactionalItem, String>("name"));
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<TransactionalItem, String>("category"));
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<TransactionalItem, String>("size"));
+        priceColumn.setCellValueFactory(new PropertyValueFactory<TransactionalItem, Double>("price"));
 
         transactionalItemsTable.getColumns().addAll(transactionIdColumn, nameColumn, categoryColumn, sizeColumn,
                 priceColumn);
@@ -93,9 +94,9 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
         refreshTableContent(null);
     }
 
-    public void refreshTableContent(ArrayList<Item> items) {
+    public void refreshTableContent(ArrayList<TransactionalItem> items) {
         if (items == null) {
-            Response<ArrayList<Item>> transactionalItemsResponse =
+            Response<ArrayList<TransactionalItem>> transactionalItemsResponse =
                     currentController.getItemsByTransaction(currentUser.getId());
 
             if (!transactionalItemsResponse.getIsSuccess()) {

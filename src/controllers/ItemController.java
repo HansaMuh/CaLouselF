@@ -30,42 +30,29 @@ public class ItemController {
 
         String query = "SELECT * FROM items WHERE status = ? AND LOWER(name) LIKE ?;";
         String status = ItemStatus.APPROVED.toString();
+        String keywordPattern = "%" + keyword.toLowerCase() + "%";
 
         try {
             PreparedStatement statement = database.prepareStatement(query);
 
-            statement.setString(1, keyword.toLowerCase());
-            statement.setString(2, status);
+            statement.setString(1, status);
+            statement.setString(2, keywordPattern);
 
             ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                Item item = new Item(
-                        resultSet.getString("id"),
-                        resultSet.getString("seller_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("size"),
-                        resultSet.getDouble("price"),
-                        resultSet.getString("category"),
-                        ItemStatus.valueOf(resultSet.getString("status")),
-                        resultSet.getString("note")
-                );
-
-                items.add(item);
-            }
+            items.addAll(getItemsFromResultSet(resultSet));
         }
         catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
-                    "Failed to browse items:\r\n- " + ex.getMessage(),
+                    "Failed to browse available items:\r\n- " + ex.getMessage(),
                     items
             );
         }
 
         return new Response<>(
                 true,
-                "Items browsed successfully.",
+                "Available items browsed successfully.",
                 items
         );
     }
@@ -77,42 +64,29 @@ public class ItemController {
 
         String query = "SELECT * FROM items WHERE status = ? AND LOWER(name) LIKE ?;";
         String status = ItemStatus.PENDING.toString();
+        String keywordPattern = "%" + keyword.toLowerCase() + "%";
 
         try {
             PreparedStatement statement = database.prepareStatement(query);
 
-            statement.setString(1, keyword.toLowerCase());
-            statement.setString(2, status);
+            statement.setString(1, status);
+            statement.setString(2, keywordPattern);
 
             ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                Item item = new Item(
-                        resultSet.getString("id"),
-                        resultSet.getString("seller_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("size"),
-                        resultSet.getDouble("price"),
-                        resultSet.getString("category"),
-                        ItemStatus.valueOf(resultSet.getString("status")),
-                        resultSet.getString("note")
-                );
-
-                items.add(item);
-            }
+            items.addAll(getItemsFromResultSet(resultSet));
         }
         catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
-                    "Failed to browse items:\r\n- " + ex.getMessage(),
+                    "Failed to browse requested items:\r\n- " + ex.getMessage(),
                     items
             );
         }
 
         return new Response<>(
                 true,
-                "Items browsed successfully.",
+                "Requested items browsed successfully.",
                 items
         );
     }
@@ -132,21 +106,7 @@ public class ItemController {
             statement.setString(1, status);
 
             ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                Item item = new Item(
-                        resultSet.getString("id"),
-                        resultSet.getString("seller_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("size"),
-                        resultSet.getDouble("price"),
-                        resultSet.getString("category"),
-                        ItemStatus.valueOf(resultSet.getString("status")),
-                        resultSet.getString("note")
-                );
-
-                items.add(item);
-            }
+            items.addAll(getItemsFromResultSet(resultSet));
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -178,21 +138,7 @@ public class ItemController {
             statement.setString(1, status);
 
             ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                Item item = new Item(
-                        resultSet.getString("id"),
-                        resultSet.getString("seller_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("size"),
-                        resultSet.getDouble("price"),
-                        resultSet.getString("category"),
-                        ItemStatus.valueOf(resultSet.getString("status")),
-                        resultSet.getString("note")
-                );
-
-                items.add(item);
-            }
+            items.addAll(getItemsFromResultSet(resultSet));
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -210,9 +156,166 @@ public class ItemController {
         );
     }
 
+    public Response<Integer> uploadItem(String sellerId, String name, String size, String price, String category) {
+        String errorMessage = validateItem(name, category, size, price);
+
+        if (!errorMessage.isEmpty()) {
+            return new Response<>(
+                    false,
+                    "Failed to upload item:\r\n" + errorMessage,
+                    null
+            );
+        }
+
+        int rowsAffected = 0;
+
+        Item latestItem = getLatestItemFromDatabase();
+        int latestId = Integer.parseInt(latestItem != null ? latestItem.getId().substring(3) : "0000");
+
+        String query = "INSERT INTO items (id, seller_id, name, size, price, category, status, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        String id = String.format("IID%04d", latestId + 1);
+        double priceNumber = Double.parseDouble(price);
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, id);
+            statement.setString(2, sellerId);
+            statement.setString(3, name);
+            statement.setString(4, size);
+            statement.setDouble(5, priceNumber);
+            statement.setString(6, category);
+            statement.setString(7, ItemStatus.PENDING.toString());
+            statement.setString(8, "");
+
+            rowsAffected = statement.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to upload item:\r\n- " + ex.getMessage(),
+                    0
+            );
+        }
+
+        return new Response<>(
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Item uploaded successfully and is pending approval." : "Failed to upload item.",
+                rowsAffected
+        );
+    }
+
+    public Response<Integer> updateItem(String id, String name, String size, String price, String category) {
+        String errorMessage = validateItem(name, category, size, price);
+
+        if (!errorMessage.isEmpty()) {
+            return new Response<>(
+                    false,
+                    "Failed to upload item:\r\n" + errorMessage,
+                    null
+            );
+        }
+
+        int rowsAffected = 0;
+
+        // Update four fields: name, size, price, and category
+        String query = "UPDATE items SET name = ?, size = ?, price = ?, category = ? WHERE id = ?;";
+        double priceNumber = Double.parseDouble(price);
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, name);
+            statement.setString(2, size);
+            statement.setDouble(3, priceNumber);
+            statement.setString(4, category);
+            statement.setString(5, id);
+
+            rowsAffected = statement.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to update item:\r\n- " + ex.getMessage(),
+                    0
+            );
+        }
+
+        return new Response<>(
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Item updated successfully." : "Failed to update item.",
+                rowsAffected
+        );
+    }
+
+    public Response<Integer> sellItem(String id) {
+        int rowsAffected = 0;
+
+        // Turn the item's status to SOLD_OUT
+        String query = "UPDATE items SET status = ? WHERE id = ?;";
+        String status = ItemStatus.SOLD_OUT.toString();
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, status);
+            statement.setString(2, id);
+
+            rowsAffected = statement.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to sell item:\r\n- " + ex.getMessage(),
+                    0
+            );
+        }
+
+        return new Response<>(
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Item sold out successfully." : "Failed to sell item.",
+                rowsAffected
+        );
+    }
+
+    public Response<Integer> invalidateItem(String id) {
+        int rowsAffected = 0;
+
+        // Turn the item's status to INVALID
+        String query = "UPDATE items SET status = ? WHERE id = ?;";
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, ItemStatus.INVALID.toString());
+            statement.setString(2, id);
+
+            rowsAffected = statement.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to invalidate item:\r\n- " + ex.getMessage(),
+                    0
+            );
+        }
+
+        return new Response<>(
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Item invalidated successfully." : "Failed to invalidate item.",
+                rowsAffected
+        );
+    }
+
     // Designed for: Approve Item feature
     // This method is used to approve an item that has been requested by a seller.
-    public Response<Item> approveItem(String id) {
+    public Response<Integer> approveItem(String id) {
+        int rowsAffected = 0;
+
         String query = "UPDATE items SET status = ? WHERE id = ?;";
         String status = ItemStatus.APPROVED.toString();
 
@@ -222,34 +325,36 @@ public class ItemController {
             statement.setString(1, status);
             statement.setString(2, id);
 
-            statement.executeUpdate();
+            rowsAffected = statement.executeUpdate();
         }
         catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
                     "Failed to approve item:\r\n- " + ex.getMessage(),
-                    null
+                    0
             );
         }
 
         return new Response<>(
-                true,
-                "Item approved successfully.",
-                null
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Item approved successfully." : "Failed to approve item.",
+                rowsAffected
         );
     }
 
-    public Response<Item> declineItem(String id, String reason) {
+    public Response<Integer> declineItem(String id, String reason) {
         String errorMessage = validateReason(reason);
 
         if (!errorMessage.isEmpty()) {
             return new Response<>(
                     false,
                     "Failed to decline item:\r\n" + errorMessage,
-                    null
+                    0
             );
         }
+
+        int rowsAffected = 0;
 
         String query = "UPDATE items SET status = ?, note = ? WHERE id = ?;";
         String status = ItemStatus.DECLINED.toString();
@@ -261,183 +366,80 @@ public class ItemController {
             statement.setString(2, reason);
             statement.setString(3, id);
 
-            statement.executeUpdate();
+            rowsAffected = statement.executeUpdate();
         }
         catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
                     "Failed to decline item:\r\n- " + ex.getMessage(),
-                    null
+                    0
             );
         }
 
         return new Response<>(
-                true,
-                "Item declined successfully.",
-                null
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Item declined successfully." : "Failed to decline item.",
+                rowsAffected
         );
     }
 
-    public Response<Item> uploadItem(String sellerId, String name, String size, String price, String category) {
-        String errorMessage = validateItem(name, category, size, price);
+    // Utilities
 
-        if (!errorMessage.isEmpty()) {
-            return new Response<>(
-                    false,
-                    "Failed to upload item:\r\n" + errorMessage,
-                    null
-            );
-        }
+    private ArrayList<Item> getItemsFromResultSet(ResultSet resultSet) {
+        ArrayList<Item> items = new ArrayList<>();
 
-        Response<String> response = checkLatestItemId();
-        if (!response.getIsSuccess()) {
-            return new Response<>(
-                    false,
-                    "Failed to upload item:\r\n- " + response.getMessage(),
-                    null
-            );
-        }
-
-        int latestId = Integer.parseInt(response.getOutput().substring(3));
-        String id = String.format("IID%04d", latestId + 1);
-
-        double priceNumber = Double.parseDouble(price);
-
-        Item item = new Item(id, sellerId, name, size, priceNumber, category, ItemStatus.PENDING, "");
-
-        String query = "INSERT INTO items (id, seller_id, name, size, price, category, status, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         try {
-            PreparedStatement statement = database.prepareStatement(query);
+            while (resultSet.next()) {
+                Item item = new Item(
+                        resultSet.getString("id"),
+                        resultSet.getString("seller_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("size"),
+                        resultSet.getDouble("price"),
+                        resultSet.getString("category"),
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
+                );
 
-            statement.setString(1, item.getId());
-            statement.setString(2, item.getSellerId());
-            statement.setString(3, item.getName());
-            statement.setString(4, item.getSize());
-            statement.setDouble(5, item.getPrice());
-            statement.setString(6, item.getCategory());
-            statement.setString(7, item.getStatus().toString());
-            statement.setString(8, item.getNote());
-
-            statement.executeUpdate();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "Failed to upload item:\r\n- " + ex.getMessage(),
-                    null
-            );
-        }
-
-        return new Response<>(
-                true,
-                "Item uploaded successfully and is pending approval.",
-                item
-        );
-    }
-
-    public Response<Item> updateItem(String id, String sellerId, String name, String size, String price,
-                                     String category) {
-        String errorMessage = validateItem(name, category, size, price);
-
-        if (!errorMessage.isEmpty()) {
-            return new Response<>(
-                    false,
-                    "Failed to upload item:\r\n" + errorMessage,
-                    null
-            );
-        }
-
-        double priceNumber = Double.parseDouble(price);
-
-        Item item = new Item(id, sellerId, name, size, priceNumber, category, ItemStatus.PENDING, "");
-
-        // Update four fields: name, size, price, and category
-        String query = "UPDATE items SET name = ?, size = ?, price = ?, category = ? WHERE id = ? AND seller_id = ?;";
-        try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, item.getName());
-            statement.setString(2, item.getSize());
-            statement.setDouble(3, item.getPrice());
-            statement.setString(4, item.getCategory());
-            statement.setString(5, item.getId());
-            statement.setString(6, item.getSellerId());
-
-            statement.executeUpdate();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "Failed to update item:\r\n- " + ex.getMessage(),
-                    null
-            );
-        }
-
-        return new Response<>(
-                true,
-                "Item updated successfully.",
-                item
-        );
-    }
-
-    public Response<Item> deleteItem(String id, String sellerId) {
-        // Turn the item's status to INVALID
-        String query = "UPDATE items SET status = ? WHERE id = ? AND seller_id = ? AND status = ?;";
-        try {
-            PreparedStatement statement = database.prepareStatement(query);
-
-            statement.setString(1, ItemStatus.INVALID.toString());
-            statement.setString(2, id);
-            statement.setString(3, sellerId);
-            statement.setString(4, ItemStatus.APPROVED.toString());
-
-            statement.executeUpdate();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "Failed to delete item:\r\n- " + ex.getMessage(),
-                    null
-            );
-        }
-
-        return new Response<>(
-                true,
-                "Item deleted successfully.",
-                null
-        );
-    }
-
-    public Response<String> checkLatestItemId() {
-        String itemId = "IID0000";
-
-        String query = "SELECT i.id FROM items AS i ORDER BY id DESC LIMIT 1;";
-        try {
-            PreparedStatement statement = database.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                itemId = resultSet.getString("id");
+                items.add(item);
             }
         }
         catch (Exception ex) {
             ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "An error occurred while checking the latest item.",
-                    itemId
-            );
         }
 
-        return new Response<>(
-                true,
-                "Latest item ID checked successfully.",
-                itemId
-        );
+        return items;
+    }
+
+    private Item getLatestItemFromDatabase() {
+        Item item = null;
+
+        String query = "SELECT i.id FROM items AS i ORDER BY id DESC LIMIT 1;";
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                item = new Item(
+                        resultSet.getString("id"),
+                        resultSet.getString("seller_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("size"),
+                        resultSet.getDouble("price"),
+                        resultSet.getString("category"),
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return item;
     }
 
     // Validations

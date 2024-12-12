@@ -3,6 +3,8 @@ package controllers;
 import enums.ItemStatus;
 import models.Item;
 import models.Transaction;
+import models.TransactionalItem;
+import models.Wishlist;
 import modules.Response;
 import singleton.Database;
 
@@ -26,8 +28,8 @@ public class TransactionController {
     
     // Methods
 
-    public Response<ArrayList<Item>> getItemsByTransaction(String userId) {
-        ArrayList<Item> items = new ArrayList<>();
+    public Response<ArrayList<TransactionalItem>> getItemsByTransaction(String userId) {
+        ArrayList<TransactionalItem> items = new ArrayList<>();
 
         String query = "SELECT t.id AS transaction_id, i.* FROM transactions AS t LEFT JOIN items AS i ON t.item_id = i.id WHERE t.user_id = ?;";
         try {
@@ -36,10 +38,102 @@ public class TransactionController {
             statement.setString(1, userId);
 
             ResultSet resultSet = statement.executeQuery();
+            items.addAll(getTransactionalItemsFromResultSet(resultSet));
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to get transactional items:\r\n- " + ex.getMessage(),
+                    items
+            );
+        }
 
+        return new Response<>(
+                true,
+                "Transactional items retrieved successfully.",
+                items
+        );
+    }
+
+    public Response<Integer> purchaseItem(String userId, String itemId) {
+        int rowsAffected = 0;
+
+        Transaction latestTransaction = getLatestTransactionFromDatabase();
+        int latestId = Integer.parseInt(latestTransaction != null ? latestTransaction.getId().substring(3) : "0000");
+
+        String query = "INSERT INTO transactions (id, user_id, item_id, date) VALUES (?, ?, ?, ?);";
+        String id = String.format("TID%04d", latestId + 1);
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, id);
+            statement.setString(2, userId);
+            statement.setString(3, itemId);
+            statement.setDate(4, date);
+
+            rowsAffected = statement.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to purchase item:\r\n- " + ex.getMessage(),
+                    0
+            );
+        }
+
+        WishlistController wishlistController = new WishlistController();
+        wishlistController.removeWishlistsByItem(itemId);
+
+        ItemController itemController = new ItemController();
+        itemController.sellItem(itemId);
+
+        return new Response<>(
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Item purchased successfully." : "Failed to purchase item.",
+                rowsAffected
+        );
+    }
+
+    // Utilities
+
+    public Transaction getLatestTransactionFromDatabase() {
+        Transaction transaction = null;
+
+        String query = "SELECT * FROM transactions ORDER BY id DESC LIMIT 1;";
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                transaction = new Transaction(
+                        resultSet.getString("id"),
+                        resultSet.getString("user_id"),
+                        resultSet.getString("item_id"),
+                        resultSet.getDate("date")
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return transaction;
+    }
+
+    public ArrayList<TransactionalItem> getTransactionalItemsFromResultSet(ResultSet resultSet) {
+        ArrayList<TransactionalItem> items = new ArrayList<>();
+
+        try {
             while (resultSet.next()) {
-                Item item = new Item(
+                TransactionalItem item = new TransactionalItem(
                         resultSet.getString("transaction_id"),
+                        resultSet.getString("id"),
                         resultSet.getString("seller_id"),
                         resultSet.getString("name"),
                         resultSet.getString("size"),
@@ -54,103 +148,9 @@ public class TransactionController {
         }
         catch (Exception ex) {
             ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "Failed to get items:\r\n- " + ex.getMessage(),
-                    items
-            );
         }
 
-        return new Response<>(
-                true,
-                "Items retrieved successfully.",
-                items
-        );
-    }
-
-    public Response<Transaction> purchaseItem(String userId, String itemId) {
-        Response<String> response = checkLatestTransactionId();
-        if (!response.getIsSuccess()) {
-            return new Response<>(
-                    false,
-                    "Failed to purchase item:\r\n- " + response.getMessage(),
-                    null
-            );
-        }
-
-        int latestId = Integer.parseInt(response.getOutput().substring(3));
-        String id = String.format("TID%04d", latestId + 1);
-
-        Transaction transaction = new Transaction(id, userId, itemId, Calendar.getInstance().getTime());
-
-        String transactionQuery = "INSERT INTO transactions (id, user_id, item_id, date) VALUES (?, ?, ?, ?);";
-        String wishlistsQuery = "DELETE FROM wishlists WHERE item_id = ?;";
-        String itemQuery = "UPDATE items SET status = ? WHERE id = ?;";
-        try {
-            PreparedStatement transactionStatement = database.prepareStatement(transactionQuery);
-
-            transactionStatement.setString(1, transaction.getId());
-            transactionStatement.setString(2, transaction.getUserId());
-            transactionStatement.setString(3, transaction.getItemId());
-            transactionStatement.setDate(4, new Date(transaction.getDate().getTime()));
-
-            transactionStatement.executeUpdate();
-
-            PreparedStatement wishlistsStatement = database.prepareStatement(wishlistsQuery);
-
-            wishlistsStatement.setString(1, transaction.getItemId());
-
-            wishlistsStatement.executeUpdate();
-
-            PreparedStatement itemStatement = database.prepareStatement(itemQuery);
-
-            itemStatement.setString(1, ItemStatus.SOLD_OUT.toString());
-            itemStatement.setString(2, transaction.getItemId());
-
-            itemStatement.executeUpdate();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "Failed to purchase item:\r\n- " + ex.getMessage(),
-                    null
-            );
-        }
-
-        return new Response<>(
-                true,
-                "Item purchased successfully.",
-                transaction
-        );
-    }
-
-    public Response<String> checkLatestTransactionId() {
-        String transactionId = "TID0000";
-
-        String query = "SELECT t.id FROM transactions AS t ORDER BY id DESC LIMIT 1;";
-        try {
-            PreparedStatement statement = database.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                transactionId = resultSet.getString("id");
-            }
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "An error occurred while checking the latest transaction ID.",
-                    transactionId
-            );
-        }
-
-        return new Response<>(
-                true,
-                "Latest transaction ID checked successfully.",
-                transactionId
-        );
+        return items;
     }
 
 }

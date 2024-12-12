@@ -132,7 +132,7 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
             String registerAddress = addressField.getText();
             String registerRole = sellerRadio.isSelected() ? "Seller" : "Buyer";
 
-            Response<User> registerResponse = currentController.register(registerUsername, registerPassword, registerPhone,
+            Response<Integer> registerResponse = currentController.register(registerUsername, registerPassword, registerPhone,
                 registerAddress,
                 registerRole);
 

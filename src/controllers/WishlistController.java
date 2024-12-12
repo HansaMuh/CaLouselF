@@ -30,27 +30,14 @@ public class WishlistController {
         ArrayList<Item> items = new ArrayList<>();
 
         String query = "SELECT i.* FROM wishlists AS w LEFT JOIN items AS i ON w.item_id = i.id WHERE w.user_id = ?;";
+
         try {
             PreparedStatement statement = database.prepareStatement(query);
 
             statement.setString(1, userId);
 
             ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                Item item = new Item(
-                        resultSet.getString("id"),
-                        resultSet.getString("seller_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("size"),
-                        resultSet.getDouble("price"),
-                        resultSet.getString("category"),
-                        ItemStatus.valueOf(resultSet.getString("status")),
-                        resultSet.getString("note")
-                );
-
-                items.add(item);
-            }
+            items.addAll(getItemsFromResultSet(resultSet));
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -68,97 +55,151 @@ public class WishlistController {
         );
     }
 
-    public Response<Wishlist> addWishlist(String itemId, String userId) {
-        Response<String> latestWishlistIdResponse = checkLatestWishlistId();
+    public Response<Integer> addWishlist(String itemId, String userId) {
+        int rowsAffected = 0;
 
-        int idNumber = Integer.parseInt(latestWishlistIdResponse.getOutput().substring(3));
-        String id = String.format("WID%04d", idNumber + 1);
-
-        Wishlist wishlist = new Wishlist(
-                id,
-                itemId,
-                userId,
-                Calendar.getInstance().getTime()
-        );
+        Wishlist latestWishlist = getLatestWishlistFromDatabase();
+        int latestId = Integer.parseInt(latestWishlist != null ? latestWishlist.getId().substring(3) : "0000");
 
         String query = "INSERT INTO wishlists (id, item_id, user_id, date) VALUES (?, ?, ?, ?);";
+        String id = String.format("WID%04d", latestId + 1);
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+
         try {
             PreparedStatement statement = database.prepareStatement(query);
 
-            statement.setString(1, wishlist.getId());
-            statement.setString(2, wishlist.getItemId());
-            statement.setString(3, wishlist.getUserId());
-            statement.setDate(4, new Date(wishlist.getDate().getTime()));
+            statement.setString(1, id);
+            statement.setString(2, itemId);
+            statement.setString(3, userId);
+            statement.setDate(4, date);
 
-            statement.executeUpdate();
+            rowsAffected = statement.executeUpdate();
         }
         catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
                     "Failed to add wishlist:\r\n- " + ex.getMessage(),
-                    null
+                    0
             );
         }
 
         return new Response<>(
-                true,
-                "Wishlist added successfully.",
-                wishlist
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Wishlist added successfully." : "No wishlist added.",
+                rowsAffected
         );
     }
 
-    public Response<Wishlist> removeWishlist(String itemId, String userId) {
+    public Response<Integer> removeWishlistsByItem(String itemId) {
+        int rowsAffected = 0;
+
+        String query = "DELETE FROM wishlists WHERE item_id = ?;";
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, itemId);
+
+            rowsAffected = statement.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to remove wishlists by item:\r\n- " + ex.getMessage(),
+                    0
+            );
+        }
+
+        return new Response<>(
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Wishlists removed successfully." : "No wishlists removed.",
+                rowsAffected
+        );
+    }
+
+    public Response<Integer> removeWishlistsByUser(String itemId, String userId) {
+        int rowsAffected = 0;
+
         String query = "DELETE FROM wishlists WHERE item_id = ? AND user_id = ?;";
+
         try {
             PreparedStatement statement = database.prepareStatement(query);
 
             statement.setString(1, itemId);
             statement.setString(2, userId);
 
-            statement.executeUpdate();
+            rowsAffected = statement.executeUpdate();
         }
         catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
-                    "Failed to remove wishlist:\r\n- " + ex.getMessage(),
-                    null
+                    "Failed to remove wishlists by user:\r\n- " + ex.getMessage(),
+                    0
             );
         }
 
         return new Response<>(
-                true,
-                "Wishlist removed successfully.",
-                null
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Wishlists removed successfully." : "No wishlists removed.",
+                rowsAffected
         );
     }
 
-    public Response<String> checkLatestWishlistId() {
-        String wishlistId = "WID0000";
+    // Utilities
 
-        String query = "SELECT w.id FROM wishlists AS w ORDER BY id DESC LIMIT 1;";
+    public ArrayList<Item> getItemsFromResultSet(ResultSet resultSet) {
+        ArrayList<Item> items = new ArrayList<>();
+
         try {
-            PreparedStatement statement = database.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Item item = new Item(
+                        resultSet.getString("id"),
+                        resultSet.getString("seller_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("size"),
+                        resultSet.getDouble("price"),
+                        resultSet.getString("category"),
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
+                );
 
-            if (resultSet.next()) {
-                wishlistId = resultSet.getString("id");
+                items.add(item);
             }
         }
         catch (Exception ex) {
-            return new Response<>(
-                    false,
-                    "An error occurred while retrieving latest wishlist ID.",
-                    null
-            );
+            ex.printStackTrace();
         }
 
-        return new Response<>(
-                true,
-                "Latest wishlist ID retrieved.",
-                wishlistId
-        );
+        return items;
+    }
+
+    public Wishlist getLatestWishlistFromDatabase() {
+        Wishlist wishlist = null;
+
+        String query = "SELECT * FROM wishlists ORDER BY id DESC LIMIT 1;";
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                wishlist = new Wishlist(
+                        resultSet.getString("id"),
+                        resultSet.getString("item_id"),
+                        resultSet.getString("user_id"),
+                        resultSet.getDate("date")
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return wishlist;
     }
 
 }

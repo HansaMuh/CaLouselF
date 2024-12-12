@@ -4,6 +4,7 @@ import enums.ItemStatus;
 import enums.OfferStatus;
 import models.Item;
 import models.Offer;
+import models.OfferedItem;
 import models.Transaction;
 import modules.Response;
 import singleton.Database;
@@ -28,138 +29,20 @@ public class OfferController {
 
     // Methods
 
-    public Response<Offer> createOffer(String userId, String itemId, String price) {
-        String errorMessage = validatePrice(price);
+    public Response<ArrayList<OfferedItem>> getOfferedItems(String sellerId) {
+        ArrayList<OfferedItem> items = new ArrayList<>();
 
-        if (!errorMessage.isEmpty()) {
-            return new Response<>(
-                    false,
-                    "Failed to create offer:\r\n" + errorMessage,
-                    null);
-        }
+        String query = "SELECT i.*, o.id AS offer_id, o.price AS offered_price FROM offers AS o LEFT JOIN items AS i ON o.item_id = i.id WHERE o.status = ? AND i.seller_id = ?;";
+        String status = OfferStatus.PENDING.toString();
 
-        Offer offer = null;
-        double priceNumber = Double.parseDouble(price);
-
-        String highestOfferQuery = "SELECT MAX(price) AS highest_offer FROM offers WHERE item_id = ?;";
-        try {
-            PreparedStatement highestOfferStatement = database.prepareStatement(highestOfferQuery);
-
-            highestOfferStatement.setString(1, itemId);
-
-            ResultSet resultSet = highestOfferStatement.executeQuery();
-
-            if (resultSet.next()) {
-                double highestOffer = resultSet.getDouble("highest_offer");
-
-                if (priceNumber < highestOffer) {
-                    return new Response<>(
-                            false,
-                            "Failed to create offer:\r\n- Offer must be higher than the current highest offer that is " + highestOffer + ".",
-                            null
-                    );
-                }
-            }
-            else {
-                String itemPriceQuery = "SELECT price FROM items where ID = ?;";
-
-                PreparedStatement itemPriceStatement = database.prepareStatement(itemPriceQuery);
-
-                itemPriceStatement.setString(1, itemId);
-
-                ResultSet itemPriceResultSet = itemPriceStatement.executeQuery();
-
-                if (itemPriceResultSet.next()) {
-                    double itemPrice = itemPriceResultSet.getDouble("price");
-
-                    if (priceNumber > itemPrice) {
-                        return new Response<>(
-                                false,
-                                "Failed to create offer:\r\n- Offer must be lower than the item price that is " + itemPrice + ".",
-                                null
-                        );
-                    }
-                }
-            }
-
-            Response<String> response = checkLatestOfferId();
-            if (!response.getIsSuccess()) {
-                return new Response<>(
-                        false,
-                        "Failed to create offer:\r\n- " + response.getMessage(),
-                        null
-                );
-            }
-
-            int latestId = Integer.parseInt(response.getOutput().substring(3));
-            String id = String.format("OID%04d", latestId + 1);
-
-            offer = new Offer(
-                    id,
-                    userId,
-                    itemId,
-                    priceNumber,
-                    Calendar.getInstance().getTime(),
-                    OfferStatus.PENDING,
-                    ""
-            );
-
-            String offerQuery = "INSERT INTO offers (id, user_id, item_id, price, date, status, reason) VALUES (?, ?, ?, ?, ?, ?, ?);";
-
-            PreparedStatement offerStatement = database.prepareStatement(offerQuery);
-
-            offerStatement.setString(1, offer.getId());
-            offerStatement.setString(2, offer.getUserId());
-            offerStatement.setString(3, offer.getItemId());
-            offerStatement.setDouble(4, offer.getPrice());
-            offerStatement.setDate(5, new Date(offer.getDate().getTime()));
-            offerStatement.setString(6, offer.getStatus().toString());
-            offerStatement.setString(7, offer.getReason());
-
-            offerStatement.executeUpdate();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "Failed to create offer:\r\n- " + ex.getMessage(),
-                    null
-            );
-        }
-
-        return new Response<>(
-                true,
-                "Offer created successfully.",
-                offer
-        );
-    }
-
-    public Response<ArrayList<Item>> getOfferedItems(String sellerId) {
-        ArrayList<Item> items = new ArrayList<>();
-
-        String query = "SELECT i.*, o.price AS offered_price FROM items AS i RIGHT JOIN offers AS o ON i.id = o.item_id WHERE i.seller_id = ? AND o.status = ?;";
         try {
             PreparedStatement statement = database.prepareStatement(query);
 
-            statement.setString(1, sellerId);
-            statement.setString(2, OfferStatus.PENDING.toString());
+            statement.setString(1, status);
+            statement.setString(2, sellerId);
 
             ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                Item item = new Item(
-                        resultSet.getString("id"),
-                        resultSet.getString("seller_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("size"),
-                        resultSet.getDouble("price"),
-                        resultSet.getString("category"),
-                        ItemStatus.valueOf(resultSet.getString("status")),
-                        String.format("%1$,.2f", resultSet.getDouble("offered_price"))
-                );
-
-                items.add(item);
-            }
+            items.addAll(getOfferedItemsFromResultSet(resultSet));
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -177,111 +60,267 @@ public class OfferController {
         );
     }
 
-    public Response<Offer> acceptOffer(String id, String userId, String itemId) {
-        String updateOfferQuery = "UPDATE offers SET status = ? WHERE id = ? AND user_id = ? AND item_id = ?;";
+    public Response<Integer> makeOffer(String userId, String itemId, String price) {
+        String errorMessage = validatePrice(price);
+
+        if (!errorMessage.isEmpty()) {
+            return new Response<>(
+                    false,
+                    "Failed to make an offer:\r\n" + errorMessage,
+                    0);
+        }
+
+        double priceNumber = Double.parseDouble(price);
+        String secondErrorMessage = validateOffer(itemId, priceNumber);
+
+        if (!secondErrorMessage.isEmpty()) {
+            return new Response<>(
+                    false,
+                    "Failed to make an offer:\r\n" + secondErrorMessage,
+                    0);
+        }
+
+        int rowsAffected = 0;
+
+        Offer latestOffer = getLatestOfferFromDatabase();
+        int latestId = Integer.parseInt(latestOffer != null ? latestOffer.getId().substring(3) : "0000");
+
+        String offerQuery = "INSERT INTO offers (id, user_id, item_id, price, date, status, reason) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String id = String.format("OID%04d", latestId + 1);
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+        String status = OfferStatus.PENDING.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(updateOfferQuery);
+            PreparedStatement statement = database.prepareStatement(offerQuery);
 
-            statement.setString(1, OfferStatus.ACCEPTED.toString());
+            statement.setString(1, id);
+            statement.setString(2, userId);
+            statement.setString(3, itemId);
+            statement.setDouble(4, priceNumber);
+            statement.setDate(5, date);
+            statement.setString(6, status);
+            statement.setString(7, "");
+
+            rowsAffected = statement.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "Failed to make an offer:\r\n- " + ex.getMessage(),
+                    0
+            );
+        }
+
+        return new Response<>(
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Offer made successfully." : "Failed to make an offer.",
+                rowsAffected
+        );
+    }
+
+    public Response<Integer> acceptOffer(String id, String userId, String itemId) {
+        int rowsAffected = 0;
+
+        String query = "UPDATE offers SET status = ? WHERE id = ?;";
+        String status = OfferStatus.ACCEPTED.toString();
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, status);
             statement.setString(2, id);
-            statement.setString(3, userId);
-            statement.setString(4, itemId);
 
-            statement.executeUpdate();
-
-            Response<Transaction> response = new TransactionController().purchaseItem(userId, itemId);
-
-            if (!response.getIsSuccess()) {
-                return new Response<>(
-                        false,
-                        "Failed to create transaction:\r\n- " + response.getMessage(),
-                        null
-                );
-            }
+            rowsAffected = statement.executeUpdate();
         }
         catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
                     "Failed to accept offer:\r\n- " + ex.getMessage(),
-                    null
+                    0
             );
         }
+
+        if (rowsAffected == 0) {
+            return new Response<>(
+                    false,
+                    "Failed to accept offer:\r\n- Offer not found.",
+                    0
+            );
+        }
+
+        TransactionController transactionController = new TransactionController();
+        Response<Integer> transactionResponse = transactionController.purchaseItem(userId, itemId);
 
         return new Response<>(
                 true,
                 "Offer accepted successfully.",
-                null
+                rowsAffected
         );
     }
 
-    public Response<Offer> declineOffer(String id, String userId, String itemId, String reason) {
+    public Response<Integer> declineOffer(String id, String userId, String itemId, String reason) {
         String errorMessage = validateReason(reason);
 
         if (!errorMessage.isEmpty()) {
             return new Response<>(
                     false,
                     "Failed to decline offer:\r\n" + errorMessage,
-                    null
+                    0
             );
         }
 
-        String updateOfferQuery = "UPDATE offers SET status = ?, reason = ? WHERE id = ? AND user_id = ? AND item_id = ?;";
+        int rowsAffected = 0;
+
+        String query = "UPDATE offers SET status = ?, reason = ? WHERE id = ?;";
+        String status = OfferStatus.DECLINED.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(updateOfferQuery);
+            PreparedStatement statement = database.prepareStatement(query);
 
-            statement.setString(1, OfferStatus.ACCEPTED.toString());
+            statement.setString(1, status);
             statement.setString(2, reason);
             statement.setString(3, id);
-            statement.setString(4, userId);
-            statement.setString(5, itemId);
 
-            statement.executeUpdate();
+            rowsAffected = statement.executeUpdate();
         }
         catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
                     "Failed to decline offer:\r\n- " + ex.getMessage(),
-                    null
+                    0
             );
         }
 
         return new Response<>(
-                true,
-                "Offer declined successfully.",
-                null
+                rowsAffected > 0,
+                rowsAffected > 0 ? "Offer declined successfully." : "Failed to decline offer.",
+                rowsAffected
         );
     }
 
-    public Response<String> checkLatestOfferId() {
-        String offerId = "OID0000";
+    // Utilities
+
+    private Offer getLatestOfferFromDatabase() {
+        Offer offer = null;
 
         String query = "SELECT o.id FROM offers AS o ORDER BY id DESC LIMIT 1;";
+
         try {
             PreparedStatement statement = database.prepareStatement(query);
+
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                offerId = resultSet.getString("id");
+                offer = new Offer(
+                        resultSet.getString("id"),
+                        resultSet.getString("user_id"),
+                        resultSet.getString("item_id"),
+                        resultSet.getDouble("price"),
+                        resultSet.getDate("date"),
+                        OfferStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("reason")
+                );
             }
         }
         catch (Exception ex) {
             ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "An error occurred while checking the latest offer ID.",
-                    offerId
-            );
         }
 
-        return new Response<>(
-                true,
-                "Latest offer ID checked successfully.",
-                offerId
-        );
+        return offer;
+    }
+
+    private Offer getHighestOfferByItem(String itemId) {
+        Offer offer = null;
+
+        String query = "SELECT * FROM offers WHERE item_id = ? ORDER BY price DESC LIMIT 1;";
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, itemId);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                offer = new Offer(
+                        resultSet.getString("id"),
+                        resultSet.getString("user_id"),
+                        resultSet.getString("item_id"),
+                        resultSet.getDouble("price"),
+                        resultSet.getDate("date"),
+                        OfferStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("reason")
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return offer;
+    }
+
+    private Item getItemFromDatabase(String itemId) {
+        Item item = null;
+
+        String query = "SELECT * FROM items WHERE id = ?;";
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, itemId);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                item = new Item(
+                        resultSet.getString("id"),
+                        resultSet.getString("seller_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("size"),
+                        resultSet.getDouble("price"),
+                        resultSet.getString("category"),
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return item;
+    }
+
+    private ArrayList<OfferedItem> getOfferedItemsFromResultSet(ResultSet resultSet) {
+        ArrayList<OfferedItem> items = new ArrayList<>();
+
+        try {
+            while (resultSet.next()) {
+                OfferedItem item = new OfferedItem(
+                        resultSet.getString("offer_id"),
+                        resultSet.getDouble("offered_price"),
+                        resultSet.getString("id"),
+                        resultSet.getString("seller_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("size"),
+                        resultSet.getDouble("price"),
+                        resultSet.getString("category"),
+                        ItemStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("note")
+                );
+
+                items.add(item);
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return items;
     }
 
     // Validations
@@ -303,6 +342,25 @@ public class OfferController {
         }
         catch (NumberFormatException ex) {
             errorMessage += "- Price must be a valid number.\r\n";
+        }
+
+        return errorMessage;
+    }
+
+    private String validateOffer(String itemId, double price) {
+        String errorMessage = "";
+
+        Offer highestOffer = getHighestOfferByItem(itemId);
+
+        if (highestOffer != null && price < highestOffer.getPrice()) {
+            errorMessage += "- Offer must be higher than the current highest offer that is " + highestOffer.getPrice() + ".\r\n";
+        }
+        else if (highestOffer == null) {
+            Item item = getItemFromDatabase(itemId);
+
+            if (price > item.getPrice()) {
+                errorMessage += "- Offer must be lower than the item price that is " + item.getPrice() + ".\r\n";
+            }
         }
 
         return errorMessage;

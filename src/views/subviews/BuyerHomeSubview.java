@@ -166,7 +166,7 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
             return;
         }
 
-        Response<Wishlist> addToWishlistResponse = wishlistController.addWishlist(item.getId(), currentUser.getId());
+        Response<Integer> addToWishlistResponse = wishlistController.addWishlist(item.getId(), currentUser.getId());
 
         MainViewController.getInstance(null).showAlert(
                 addToWishlistResponse.getIsSuccess(),

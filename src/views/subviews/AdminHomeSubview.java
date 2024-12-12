@@ -145,7 +145,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
             return;
         }
 
-        Response<Item> approveItemResponse = itemController.approveItem(item.getId());
+        Response<Integer> approveItemResponse = itemController.approveItem(item.getId());
 
         MainViewController.getInstance(null).showAlert(
                 approveItemResponse.getIsSuccess(),
@@ -163,7 +163,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
             return;
         }
 
-        Response<Item> declineItemResponse = itemController.declineItem(item.getId(), reasonField.getText());
+        Response<Integer> declineItemResponse = itemController.declineItem(item.getId(), reasonField.getText());
 
         MainViewController.getInstance(null).showAlert(
                 declineItemResponse.getIsSuccess(),

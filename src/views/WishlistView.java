@@ -1,6 +1,5 @@
 package views;
 
-import controllers.ItemController;
 import controllers.WishlistController;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -143,7 +142,7 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
             return;
         }
 
-        Response<Wishlist> removeWishlistResponse = currentController.removeWishlist(item.getId(), currentUser.getId());
+        Response<Integer> removeWishlistResponse = currentController.removeWishlistsByUser(item.getId(), currentUser.getId());
 
         MainViewController.getInstance(null).showAlert(
                 removeWishlistResponse.getIsSuccess(),

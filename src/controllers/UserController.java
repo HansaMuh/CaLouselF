@@ -1,12 +1,14 @@
 package controllers;
 
 import enums.UserRole;
+import models.Item;
 import modules.Response;
 import models.User;
 import singleton.Database;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 public class UserController {
 
@@ -23,36 +25,119 @@ public class UserController {
     // Methods
 
     public Response<User> login(String username, String password) {
-        if (username.isEmpty() || password.isEmpty()) {
+        String errorMessage = validateLoginInfo(username, password);
+
+        if (!errorMessage.isEmpty()) {
             return new Response<>(
                     false,
-                    "Login failed:\r\n- Username and password cannot be empty.",
+                    "Login failed:\r\n" + errorMessage,
                     null
             );
         }
 
         if (username.equals("admin") && password.equals("admin")) {
+            User adminUser = new User(
+                    "UID0000",
+                    username,
+                    password,
+                    "",
+                    "",
+                    UserRole.ADMIN
+            );
+
             return new Response<>(
                     true,
                     "Login success.",
-                    new User(
-                            "UID0000",
-                            username,
-                            password,
-                            "",
-                            "",
-                            UserRole.ADMIN)
+                    adminUser
             );
         }
 
         User user = null;
 
         String query = "SELECT * FROM users WHERE username = ? AND password = ?;";
+
         try {
             PreparedStatement statement = database.prepareStatement(query);
 
             statement.setString(1, username);
             statement.setString(2, password);
+
+            ResultSet resultSet = statement.executeQuery();
+            user = getUsersFromResultSet(resultSet).get(0);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "An error occurred while logging in:\r\n" + ex.getMessage(),
+                    null
+            );
+        }
+
+        return new Response<>(
+                user != null,
+                user != null ? "Login success." : "Login failed:\r\nInvalid username or password.",
+                user
+        );
+    }
+
+    public Response<Integer> register(String username, String password, String phoneNumber, String address, String role) {
+        String errorMessage = validateAccount(username, password, phoneNumber, address, role);
+
+        if (!errorMessage.isEmpty()) {
+            return new Response<>(
+                    false,
+                    "Registration failed:\r\n" + errorMessage,
+                    null
+            );
+        }
+
+        int rowsAffected = 0;
+
+        User latestUser = getLatestUserFromDatabase();
+        int latestId = Integer.parseInt(latestUser != null ? latestUser.getId().substring(3) : "0000");
+
+        String query = "INSERT INTO users (id, username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?, ?);";
+        String id = String.format("UID%04d", latestId + 1);
+        String targetRole = role.toUpperCase();
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
+
+            statement.setString(1, id);
+            statement.setString(2, username);
+            statement.setString(3, password);
+            statement.setString(4, phoneNumber);
+            statement.setString(5, address);
+            statement.setString(6, targetRole);
+
+            rowsAffected = statement.executeUpdate();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return new Response<>(
+                    false,
+                    "An error occurred while saving the user:\r\n" + ex.getMessage(),
+                    0
+            );
+        }
+
+        return new Response<>(
+                rowsAffected > 0,
+                rowsAffected > 0 ? "User saved successfully." : "User failed to save.",
+                rowsAffected
+        );
+    }
+
+    // Utilities
+
+    private User getLatestUserFromDatabase() {
+        User user = null;
+
+        String query = "SELECT * FROM users ORDER BY id DESC LIMIT 1;";
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query);
 
             ResultSet resultSet = statement.executeQuery();
 
@@ -65,88 +150,57 @@ public class UserController {
                         resultSet.getString("address"),
                         UserRole.valueOf(resultSet.getString("role"))
                 );
-
-                return new Response<>(
-                        true,
-                        "Login success.",
-                        user
-                );
             }
         }
         catch (Exception ex) {
             ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "An error occurred while logging in.",
-                    null
-            );
         }
 
-        return new Response<>(
-                false,
-                "Invalid username or password.",
-                null
-        );
+        return user;
     }
 
-    public Response<User> register(String username, String password, String phoneNumber, String address,
-                                          String role) {
-        Response<String> validationResponse = checkAccountValidation(username, password, phoneNumber, address, role);
+    private ArrayList<User> getUsersFromResultSet(ResultSet resultSet) {
+        ArrayList<User> users = new ArrayList<>();
 
-        if (!validationResponse.getIsSuccess()) {
-            return new Response<>(
-                    false,
-                    "Registration failed:\r\n" + validationResponse.getOutput(),
-                    null
-            );
-        }
-
-        Response<String> latestUserIdResponse = checkLatestUserId();
-        if (!latestUserIdResponse.getIsSuccess()) {
-            return new Response<>(
-                    false,
-                    "An error occurred while registering.",
-                    null
-            );
-        }
-
-        int idNumber = Integer.parseInt(latestUserIdResponse.getOutput().substring(3));
-        String id = String.format("UID%04d", idNumber + 1); // e.g. UID0001
-        UserRole userRole = UserRole.valueOf(role.toUpperCase());
-
-        User user = new User(id, username, password, phoneNumber, address, userRole);
-
-        String query = "INSERT INTO users (id, username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?, ?);";
         try {
-            PreparedStatement statement = database.prepareStatement(query);
+            while (resultSet.next()) {
+                User user = new User(
+                        resultSet.getString("id"),
+                        resultSet.getString("username"),
+                        resultSet.getString("password"),
+                        resultSet.getString("phone_number"),
+                        resultSet.getString("address"),
+                        UserRole.valueOf(resultSet.getString("role"))
+                );
 
-            statement.setString(1, user.getId());
-            statement.setString(2, user.getUsername());
-            statement.setString(3, user.getPassword());
-            statement.setString(4, user.getPhoneNumber());
-            statement.setString(5, user.getAddress());
-            statement.setString(6, user.getRole().toString());
-
-            statement.executeUpdate();
+                users.add(user);
+            }
         }
         catch (Exception ex) {
             ex.printStackTrace();
-            return new Response<>(
-                    false,
-                    "An error occurred while saving the user.",
-                    null
-            );
         }
 
-        return new Response<>(
-                true,
-                "Registration success.",
-                user
-        );
+        return users;
     }
 
-    public Response<String> checkAccountValidation(String username, String password, String phoneNumber,
-                                                          String address, String role) {
+    // Validations
+
+    private String validateLoginInfo(String username, String password) {
+        String errorMessage = "";
+
+        if (username.isEmpty()) {
+            errorMessage += "- Username cannot be empty.\r\n";
+        }
+
+        if (password.isEmpty()) {
+            errorMessage += "- Password cannot be empty.\r\n";
+        }
+
+        return errorMessage;
+    }
+
+    private String validateAccount(String username, String password, String phoneNumber,
+                                   String address, String role) {
         String errorMessage = "";
 
         errorMessage += validateUsername(username);
@@ -155,49 +209,8 @@ public class UserController {
         errorMessage += validateAddress(address);
         errorMessage += validateRole(role);
 
-        if (!errorMessage.isEmpty()) {
-            return new Response<>(
-                    false,
-                    "Validation failed.",
-                    errorMessage);
-        }
-        else {
-            return new Response<>(
-                    true,
-                    "Validation success.",
-                    null
-            );
-        }
+        return errorMessage;
     }
-
-    public Response<String> checkLatestUserId() {
-        String userId = "UID0000";
-
-        String query = "SELECT u.id FROM users AS u ORDER BY id DESC LIMIT 1;";
-        try {
-            PreparedStatement statement = database.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                userId = resultSet.getString("id");
-            }
-        }
-        catch (Exception ex) {
-            return new Response<>(
-                    false,
-                    "An error occurred while retrieving latest user ID.",
-                    null
-            );
-        }
-
-        return new Response<>(
-                true,
-                "Latest user ID retrieved.",
-                userId
-        );
-    }
-
-    // Validations
 
     private String validateUsername(String username) {
         String errorMessage = "";
@@ -274,7 +287,6 @@ public class UserController {
             statement.setString(1, username);
 
             ResultSet resultSet = statement.executeQuery();
-
             return !resultSet.next();
         }
         catch (Exception ex) {
@@ -305,7 +317,7 @@ public class UserController {
 
         try {
             Long.parseLong(numberPart);
-            return numberPart.length() >= 8; // total panjang termasuk +62 >=10
+            return numberPart.length() >= 8; // Total panjang termasuk +62: >= 10
         }
         catch (Exception ex) {
             ex.printStackTrace();
