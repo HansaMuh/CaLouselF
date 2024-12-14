@@ -18,13 +18,11 @@ import java.util.Calendar;
 public class OfferController {
 
     // Constructor
-
     public OfferController() {
         database = Database.getInstance();
     }
 
     // Properties
-
     private Database database;
 
     // Methods
@@ -32,16 +30,16 @@ public class OfferController {
     public Response<ArrayList<OfferedItem>> getOfferedItems(String sellerId) {
         ArrayList<OfferedItem> items = new ArrayList<>();
 
-        String query = "SELECT i.*, o.id AS offer_id, o.price AS offered_price FROM offers AS o LEFT JOIN items AS i ON o.item_id = i.id WHERE o.status = ? AND i.seller_id = ?;";
+        String query = "SELECT i.*, o.id AS offer_id, o.price AS offered_price FROM offers AS o " +
+                "LEFT JOIN items AS i ON o.item_id = i.id " +
+                "WHERE o.status = ? AND i.seller_id = ?;";
         String status = OfferStatus.PENDING.toString();
 
         try {
             PreparedStatement statement = database.prepareStatement(query, status, sellerId);
-
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getOfferedItemsFromResultSet(resultSet));
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
@@ -64,7 +62,8 @@ public class OfferController {
             return new Response<>(
                     false,
                     "Failed to make an offer:\r\n" + errorMessage,
-                    0);
+                    0
+            );
         }
 
         double priceNumber = Double.parseDouble(price);
@@ -74,26 +73,29 @@ public class OfferController {
             return new Response<>(
                     false,
                     "Failed to make an offer:\r\n" + secondErrorMessage,
-                    0);
+                    0
+            );
         }
 
         int rowsAffected = 0;
 
+        // Ambil offer terakhir dari database
         Offer latestOffer = getLatestOfferFromDatabase();
-        int latestId = Integer.parseInt(latestOffer != null ? latestOffer.getId().substring(3) : "0000");
+        int latestId = 0;
+        if (latestOffer != null) {
+            latestId = Integer.parseInt(latestOffer.getId().substring(3));
+        }
 
         String offerQuery = "INSERT INTO offers (id, user_id, item_id, price, date, status, reason) VALUES (?, ?, ?, ?, ?, ?, ?);";
-        String id = String.format("OID%04d", latestId + 1);
+        String newId = String.format("OID%04d", latestId + 1);
         Date date = new Date(Calendar.getInstance().getTime().getTime());
         String status = OfferStatus.PENDING.toString();
         String reason = "";
 
         try {
-            PreparedStatement statement = database.prepareStatement(offerQuery, id, userId, itemId, priceNumber, date, status, reason);
-
+            PreparedStatement statement = database.prepareStatement(offerQuery, newId, userId, itemId, priceNumber, date, status, reason);
             rowsAffected = statement.executeUpdate();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
@@ -117,10 +119,8 @@ public class OfferController {
 
         try {
             PreparedStatement statement = database.prepareStatement(query, status, id);
-
             rowsAffected = statement.executeUpdate();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
@@ -137,6 +137,7 @@ public class OfferController {
             );
         }
 
+        // Lanjutkan dengan melakukan purchase
         TransactionController transactionController = new TransactionController();
         Response<Integer> transactionResponse = transactionController.purchaseItem(userId, itemId);
 
@@ -165,10 +166,8 @@ public class OfferController {
 
         try {
             PreparedStatement statement = database.prepareStatement(query, status, reason, id);
-
             rowsAffected = statement.executeUpdate();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
@@ -189,11 +188,11 @@ public class OfferController {
     private Offer getLatestOfferFromDatabase() {
         Offer offer = null;
 
-        String query = "SELECT o.id FROM offers AS o ORDER BY id DESC LIMIT 1;";
+        // Perbaiki query untuk mengambil semua kolom
+        String query = "SELECT * FROM offers ORDER BY id DESC LIMIT 1;";
 
         try {
             PreparedStatement statement = database.prepareStatement(query);
-
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -207,8 +206,7 @@ public class OfferController {
                         resultSet.getString("reason")
                 );
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -222,7 +220,6 @@ public class OfferController {
 
         try {
             PreparedStatement statement = database.prepareStatement(query, itemId);
-
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -236,8 +233,7 @@ public class OfferController {
                         resultSet.getString("reason")
                 );
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -251,7 +247,6 @@ public class OfferController {
 
         try {
             PreparedStatement statement = database.prepareStatement(query, itemId);
-
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -266,8 +261,7 @@ public class OfferController {
                         resultSet.getString("note")
                 );
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -291,11 +285,9 @@ public class OfferController {
                         ItemStatus.valueOf(resultSet.getString("status")),
                         resultSet.getString("note")
                 );
-
                 items.add(item);
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -311,15 +303,12 @@ public class OfferController {
             errorMessage += "- Price cannot be empty.\r\n";
         }
 
-        // Check if price is a valid number
         try {
             double value = Double.parseDouble(price);
-
             if (value <= 0) {
                 errorMessage += "- Price must be greater than 0.\r\n";
             }
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             errorMessage += "- Price must be a valid number.\r\n";
         }
 
@@ -333,11 +322,10 @@ public class OfferController {
 
         if (highestOffer != null && price < highestOffer.getPrice()) {
             errorMessage += "- Offer must be higher than the current highest offer that is " + highestOffer.getPrice() + ".\r\n";
-        }
-        else if (highestOffer == null) {
+        } else if (highestOffer == null) {
             Item item = getItemFromDatabase(itemId);
 
-            if (price > item.getPrice()) {
+            if (item != null && price > item.getPrice()) {
                 errorMessage += "- Offer must be lower than the item price that is " + item.getPrice() + ".\r\n";
             }
         }
@@ -347,11 +335,9 @@ public class OfferController {
 
     private String validateReason(String reason) {
         String errorMessage = "";
-
         if (reason.isEmpty()) {
             errorMessage += "- Reason cannot be empty.\r\n";
         }
-
         return errorMessage;
     }
 

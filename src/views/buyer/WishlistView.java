@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
@@ -31,7 +32,7 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
         init();
         setLayout();
         setTable();
-        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
+        setStyling(); 
     }
 
     // Properties
@@ -100,8 +101,124 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setStyling() {
-        // TODO: Implement styling
+        // Main layout styling (VBox)
+        setStyle("-fx-background-color: #f9f9f9; -fx-padding: 20px; -fx-spacing: 15px;");
+
+        // Title Label styling
+        titleLabel.setStyle(
+            "-fx-font-size: 24px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: #2c3e50; " +  // Dark blue-gray color for title
+            "-fx-padding: 10px 0;"
+        );
+
+        // Caption Label styling
+        captionLabel.setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #7f8c8d; " +  // Soft gray for caption text
+            "-fx-padding: 5px 0;"
+        );
+
+        // Styling for the TableView
+        wishlistTable.setStyle(
+            "-fx-background-color: white; " +
+            "-fx-border-radius: 8px; " +
+            "-fx-border-color: #dfe6e9; " +  // Light gray border
+            "-fx-border-width: 1px; " +
+            "-fx-padding: 10px; " +
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2c3e50;"  // Dark blue-gray for text
+        );
+
+        // Styling Table Rows for Alternating Colors
+        wishlistTable.setRowFactory(tv -> {
+            TableRow<Item> row = new TableRow<>() {
+                @Override
+                protected void updateItem(Item item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setStyle("-fx-background-color: white;"); // Default white
+                    } else if (isSelected()) {
+                        setStyle("-fx-background-color: #d1f2eb;"); // Light green for selected row
+                    } else if (getIndex() % 2 == 0) {
+                        setStyle("-fx-background-color: #f8f9fa;"); // Slightly gray for alternating rows
+                    } else {
+                        setStyle("-fx-background-color: white;"); // Pure white for default rows
+                    }
+                }
+            };
+            row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #d1f2eb;")); // Hover effect
+            row.setOnMouseExited(e -> row.setStyle("")); // Reset on hover exit
+            return row;
+        });
+
+        // Styling TableView Columns
+        for (TableColumn<Item, ?> column : wishlistTable.getColumns()) {
+            column.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-size: 14px;");
+        }
+
+        // Remove Button styling
+        removeButton.setStyle(
+            "-fx-background-color: #e74c3c; " +  // Red color for remove button
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        );
+
+        // Button hover effect
+        removeButton.setOnMouseEntered(e -> 
+            removeButton.setStyle(
+                "-fx-background-color: #c0392b; " +  // Darker red on hover
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 16px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10px 20px; " +
+                "-fx-border-radius: 5px; " +
+                "-fx-cursor: hand;"
+            )
+        );
+
+        removeButton.setOnMouseExited(e -> 
+            removeButton.setStyle(
+                "-fx-background-color: #e74c3c; " +  // Revert to original color
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 16px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10px 20px; " +
+                "-fx-border-radius: 5px; " +
+                "-fx-cursor: hand;"
+            )
+        );
+
+        // Button click effect
+        removeButton.setOnMousePressed(e -> 
+            removeButton.setStyle(
+                "-fx-background-color: #c0392b; " +  // Darker red when clicked
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 16px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10px 20px; " +
+                "-fx-border-radius: 5px; " +
+                "-fx-cursor: hand;"
+            )
+        );
+
+        removeButton.setOnMouseReleased(e -> 
+            removeButton.setStyle(
+                "-fx-background-color: #e74c3c; " +  // Revert to original color after release
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 16px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10px 20px; " +
+                "-fx-border-radius: 5px; " +
+                "-fx-cursor: hand;"
+            )
+        );
     }
+
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {

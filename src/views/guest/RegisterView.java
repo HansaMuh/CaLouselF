@@ -13,16 +13,15 @@ import view_controllers.MainViewController;
 public class RegisterView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
-
     public RegisterView() {
         this.userController = new UserController();
 
         init();
         setLayout();
+        setStyling(); 
     }
 
     // Properties
-
     private UserController userController;
 
     private Label titleLabel;
@@ -83,7 +82,7 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
         buyerRadio = new RadioButton("Buyer");
         buyerRadio.setToggleGroup(roleGroup);
 
-        sellerRadio.setSelected(true);
+        sellerRadio.setSelected(true); // Default selection
 
         registerButton = new Button("Register");
         registerButton.setOnAction(this);
@@ -118,6 +117,66 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
         getChildren().addAll(titleLabel, captionLabel, formGrid, buttonGrid);
     }
 
+    private void setStyling() {
+        // Styling for titleLabel
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF50; -fx-margin-bottom: 10px;");
+
+        // Styling for captionLabel
+        captionLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #555555; -fx-margin-bottom: 20px;");
+
+        // Styling for formGrid
+        formGrid.setStyle("-fx-background-color: #f9f9f9; -fx-border-radius: 8px; -fx-padding: 15px;");
+        formGrid.setVgap(15);
+        formGrid.setHgap(10);
+
+        // Styling for usernameField, passwordField, phoneField, and addressField
+        usernameField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
+        passwordField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
+        phoneField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
+        addressField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
+
+        // Styling for labels
+        usernameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
+        passwordLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
+        phoneLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
+        addressLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
+        roleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
+
+        // Styling for radio buttons (Seller, Buyer)
+        sellerRadio.setStyle("-fx-font-size: 14px; -fx-text-fill: #555555;");
+        buyerRadio.setStyle("-fx-font-size: 14px; -fx-text-fill: #555555;");
+
+        // Styling for registerButton
+        registerButton.setStyle(
+                "-fx-background-color: #4CAF50; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 14px; " +
+                "-fx-border-radius: 4px; " +
+                "-fx-padding: 10px; " +
+                "-fx-font-weight: bold;");
+
+        // Hover effects for registerButton
+        registerButton.setOnMouseEntered(e -> registerButton.setStyle(
+                "-fx-background-color: #45a049; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 14px; " +
+                "-fx-border-radius: 4px; " +
+                "-fx-padding: 10px; " +
+                "-fx-font-weight: bold;"));
+
+        registerButton.setOnMouseExited(e -> registerButton.setStyle(
+                "-fx-background-color: #4CAF50; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 14px; " +
+                "-fx-border-radius: 4px; " +
+                "-fx-padding: 10px; " +
+                "-fx-font-weight: bold;"));
+
+        // Additional background and layout styling for VBox
+        setStyle("-fx-background-color: #eeeeee; -fx-padding: 25px; -fx-alignment: center;");
+        setSpacing(20);
+    }
+
     // Helpers
 
     private void register() {
@@ -128,8 +187,7 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
         String registerRole = sellerRadio.isSelected() ? "Seller" : "Buyer";
 
         Response<Integer> registerResponse = userController.register(registerUsername, registerPassword, registerPhone,
-                registerAddress,
-                registerRole);
+                registerAddress, registerRole);
 
         MainViewController.getInstance(null).showAlert(registerResponse.getIsSuccess(),
                 "Register account", registerResponse.getMessage());
@@ -142,10 +200,8 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
     // Overrides
 
     @Override
-    public void handle(ActionEvent evt)
-    {
-        if (evt.getSource() == registerButton)
-        {
+    public void handle(ActionEvent evt) {
+        if (evt.getSource() == registerButton) {
             register();
         }
     }

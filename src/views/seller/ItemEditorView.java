@@ -24,7 +24,7 @@ public class ItemEditorView extends VBox implements EventHandler<ActionEvent> {
         init();
         setLayout();
         setDetails();
-        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
+        setStyling(); 
     }
 
     // Properties
@@ -133,8 +133,117 @@ public class ItemEditorView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setStyling() {
-        // TODO: Implement styling
+        // Main VBox styling
+        setStyle("-fx-background-color: #f9f9f9; -fx-padding: 20px; -fx-spacing: 15px;");
+
+        // Title Label styling
+        titleLabel.setStyle(
+            "-fx-font-size: 24px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: #34495e; " +  // Dark color for title
+            "-fx-padding: 10px 0;"
+        );
+
+        // Caption Label styling
+        captionLabel.setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #7f8c8d; " +  // Lighter gray for caption text
+            "-fx-padding: 5px 0;"
+        );
+
+        // Form Grid styling
+        formGrid.setStyle(
+            "-fx-background-color: #ffffff; " +  // White background for the form
+            "-fx-border-color: #bdc3c7; " +  // Light gray border color
+            "-fx-border-width: 1px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-padding: 15px;"
+        );
+
+        // Styling for Labels in the Form
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+        categoryLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+        sizeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+        priceLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+
+        // Styling for Text Fields
+        nameField.setStyle(
+            "-fx-background-color: #ffffff; " +  // White background
+            "-fx-border-color: #bdc3c7; " +  // Light gray border
+            "-fx-border-width: 1px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-padding: 5px; " +
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2c3e50;"  // Dark text color
+        );
+        categoryField.setStyle(nameField.getStyle());
+        sizeField.setStyle(nameField.getStyle());
+        priceField.setStyle(nameField.getStyle());
+
+        // Button Grid styling
+        buttonGrid.setStyle("-fx-spacing: 10px;");
+
+        // Save Button styling
+        saveButton.setStyle(
+            "-fx-background-color: #27ae60; " +  // Green background for Save
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        );
+
+        saveButton.setOnMouseEntered(e -> saveButton.setStyle(
+            "-fx-background-color: #229954; " +  // Darker green on hover
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+        saveButton.setOnMouseExited(e -> saveButton.setStyle(
+            "-fx-background-color: #27ae60; " +  // Original green background
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+
+        // Cancel Button styling
+        cancelButton.setStyle(
+            "-fx-background-color: #e74c3c; " +  // Red background for Cancel
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        );
+
+        cancelButton.setOnMouseEntered(e -> cancelButton.setStyle(
+            "-fx-background-color: #c0392b; " +  // Darker red on hover
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+        cancelButton.setOnMouseExited(e -> cancelButton.setStyle(
+            "-fx-background-color: #e74c3c; " +  // Original red background
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
     }
+
 
     // Helpers
 

@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
@@ -29,7 +30,7 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
         init();
         setLayout();
         setTable();
-        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
+        setStyling(); 
 
         // Check if the view gets added back to a container by adding an event listener
         // to the view's parent property
@@ -98,8 +99,67 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
     }
 
     private void setStyling() {
-        // TODO: Implement styling
+        // Styling untuk layout utama
+        setStyle("-fx-background-color: #f4f7fc; -fx-padding: 20px; -fx-spacing: 15px;");
+
+        // Styling tombol
+        String buttonStyle =
+            "-fx-background-color: #3f51b5; " +  // Indigo color
+            "-fx-text-fill: white; " +
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 14px; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-background-radius: 5px;" +
+            "-fx-cursor: hand;";
+
+        viewOffersButton.setStyle(buttonStyle);
+        viewItemsButton.setStyle(buttonStyle);
+
+        // Hover efek untuk tombol
+        viewOffersButton.setOnMouseEntered(e -> viewOffersButton.setStyle(buttonStyle + "-fx-background-color: #303f9f;"));
+        viewOffersButton.setOnMouseExited(e -> viewOffersButton.setStyle(buttonStyle));
+
+        viewItemsButton.setOnMouseEntered(e -> viewItemsButton.setStyle(buttonStyle + "-fx-background-color: #303f9f;"));
+        viewItemsButton.setOnMouseExited(e -> viewItemsButton.setStyle(buttonStyle));
+
+        // Styling untuk TableView
+        itemsTable.setStyle(
+            "-fx-background-color: white; " +
+            "-fx-border-color: #dcdcdc; " +
+            "-fx-border-radius: 10px; " +
+            "-fx-background-radius: 10px; " +
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2c3e50;" // Dark text
+        );
+
+        // Menambahkan alternating row colors
+        itemsTable.setRowFactory(tv -> {
+            return new TableRow<Item>() {
+                @Override
+                protected void updateItem(Item item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setStyle("-fx-background-color: white;");
+                    } else if (getIndex() % 2 == 0) {
+                        setStyle("-fx-background-color: #f9f9f9;"); // Light gray for even rows
+                    } else {
+                        setStyle("-fx-background-color: white;"); // White for odd rows
+                    }
+                }
+            };
+        });
+
+        // Styling kolom header tabel
+        for (TableColumn<Item, ?> column : itemsTable.getColumns()) {
+            column.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #34495e;");
+        }
+
+        // Styling bottomPane
+        bottomPane.setStyle("-fx-background-color: #ffffff; -fx-padding: 10px; -fx-border-color: #e0e0e0; " +
+            "-fx-border-width: 1px 0 0 0; -fx-border-radius: 5px;");
     }
+
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {

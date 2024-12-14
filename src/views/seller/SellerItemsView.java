@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
@@ -32,7 +33,7 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
         init();
         setLayout();
         setTable();
-        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
+        setStyling(); 
 
         // Check if the view gets added back to a container by adding an event listener
         // to the view's parent property
@@ -119,8 +120,159 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setStyling() {
-        // TODO: Implement styling
+        // Main VBox styling
+        setStyle("-fx-background-color: #f9f9f9; -fx-padding: 20px; -fx-spacing: 15px;");
+
+        // Title Label styling
+        titleLabel.setStyle(
+            "-fx-font-size: 24px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: #34495e; " +  // Dark text color for the title
+            "-fx-padding: 10px 0;"
+        );
+
+        // Caption Label styling
+        captionLabel.setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #7f8c8d; " +  // Subtle gray for caption text
+            "-fx-padding: 5px 0;"
+        );
+
+        // TableView styling
+        sellerItemsTable.setStyle(
+            "-fx-background-color: white; " +
+            "-fx-border-color: #bdc3c7; " +
+            "-fx-border-width: 1px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-padding: 10px; " +
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2c3e50;"
+        );
+
+        // Table Column Header styling
+        for (TableColumn<Item, ?> column : sellerItemsTable.getColumns()) {
+            column.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-alignment: CENTER;");
+        }
+
+        // Alternating row colors
+        sellerItemsTable.setRowFactory(tv -> {
+            TableRow<Item> row = new TableRow<>() {
+                @Override
+                protected void updateItem(Item item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null) {
+                        setStyle("-fx-background-color: white;");
+                    } else {
+                        if (isSelected()) {
+                            setStyle("-fx-background-color: #ecf0f1;");  // Light gray for selected row
+                        } else {
+                            setStyle("-fx-background-color: #ffffff;");  // White for unselected row
+                        }
+                    }
+                }
+            };
+
+            // Hover effect for rows
+            row.setOnMouseEntered(event -> row.setStyle("-fx-background-color: #ecf0f1;"));
+            row.setOnMouseExited(event -> row.setStyle("-fx-background-color: white;"));
+            return row;
+        });
+
+        // Bottom pane styling
+        bottomPane.setStyle("-fx-spacing: 10px;");
+
+        // Upload Button styling
+        uploadButton.setStyle(
+            "-fx-background-color: #3498db; " +  // Blue color for upload button
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        );
+
+        // Edit Button styling
+        editButton.setStyle(
+            "-fx-background-color: #27ae60; " +  // Green color for edit button
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        );
+
+        // Delete Button styling
+        deleteButton.setStyle(
+            "-fx-background-color: #e74c3c; " +  // Red color for delete button
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        );
+
+        // Hover effects for buttons
+        uploadButton.setOnMouseEntered(e -> uploadButton.setStyle(
+            "-fx-background-color: #2980b9; " +  // Darker blue for hover
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+        uploadButton.setOnMouseExited(e -> uploadButton.setStyle(
+            "-fx-background-color: #3498db; " +  // Original blue
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+
+        editButton.setOnMouseEntered(e -> editButton.setStyle(
+            "-fx-background-color: #229954; " +  // Darker green for hover
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+        editButton.setOnMouseExited(e -> editButton.setStyle(
+            "-fx-background-color: #27ae60; " +  // Original green
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+
+        deleteButton.setOnMouseEntered(e -> deleteButton.setStyle(
+            "-fx-background-color: #c0392b; " +  // Darker red for hover
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+        deleteButton.setOnMouseExited(e -> deleteButton.setStyle(
+            "-fx-background-color: #e74c3c; " +  // Original red
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
     }
+
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {

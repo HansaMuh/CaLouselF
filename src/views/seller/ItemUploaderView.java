@@ -24,7 +24,7 @@ public class ItemUploaderView extends VBox implements EventHandler<ActionEvent> 
 
         init();
         setLayout();
-        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
+        setStyling(); 
     }
 
     // Properties
@@ -121,8 +121,89 @@ public class ItemUploaderView extends VBox implements EventHandler<ActionEvent> 
     }
 
     private void setStyling() {
-        // TODO: Implement styling
+        // Main VBox styling
+        setStyle("-fx-background-color: #f4f6f7; -fx-padding: 20px; -fx-spacing: 15px;");
+
+        // Title Label styling
+        titleLabel.setStyle(
+            "-fx-font-size: 24px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: #34495e; " +  // Dark text color for the title
+            "-fx-padding: 10px 0;"
+        );
+
+        // Caption Label styling
+        captionLabel.setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #7f8c8d; " +  // Lighter gray for caption text
+            "-fx-padding: 5px 0;"
+        );
+
+        // Form Grid styling
+        formGrid.setStyle(
+            "-fx-background-color: #ffffff; " +  // White background for the form
+            "-fx-border-color: #bdc3c7; " +  // Light gray border
+            "-fx-border-width: 1px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-padding: 15px;"
+        );
+
+        // Styling for Labels in the form
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+        categoryLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+        sizeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+        priceLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+
+        // Styling for TextFields
+        nameField.setStyle(
+            "-fx-background-color: #ffffff; " +  // White background
+            "-fx-border-color: #bdc3c7; " +  // Light gray border
+            "-fx-border-width: 1px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-padding: 5px; " +
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2c3e50;"  // Dark text color
+        );
+        categoryField.setStyle(nameField.getStyle());
+        sizeField.setStyle(nameField.getStyle());
+        priceField.setStyle(nameField.getStyle());
+
+        // Button styling
+        uploadButton.setStyle(
+            "-fx-background-color: #3498db; " +  // Blue color for the upload button
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        );
+
+        // Button hover effect
+        uploadButton.setOnMouseEntered(e -> 
+            uploadButton.setStyle(
+                "-fx-background-color: #2980b9; " +  // Darker blue on hover
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 16px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10px 20px; " +
+                "-fx-border-radius: 5px; " +
+                "-fx-cursor: hand;"
+            )
+        );
+        uploadButton.setOnMouseExited(e -> 
+            uploadButton.setStyle(
+                "-fx-background-color: #3498db; " +  // Original blue color
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 16px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10px 20px; " +
+                "-fx-border-radius: 5px; " +
+                "-fx-cursor: hand;"
+            )
+        );
     }
+
 
     // Helpers
 

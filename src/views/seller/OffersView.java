@@ -28,7 +28,7 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
         init();
         setLayout();
         setTable();
-        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
+        setStyling(); 
     }
 
     // Properties
@@ -111,8 +111,137 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setStyling() {
-        // TODO: Implement styling
+        // Main VBox styling
+        setStyle("-fx-background-color: #f9f9f9; -fx-padding: 20px; -fx-spacing: 15px;");
+
+        // Title Label styling
+        titleLabel.setStyle(
+            "-fx-font-size: 24px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: #34495e; " +  // Dark title color
+            "-fx-padding: 10px 0;"
+        );
+
+        // Caption Label styling
+        captionLabel.setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #7f8c8d; " +  // Subtle gray for captions
+            "-fx-padding: 5px 0;"
+        );
+
+        // TableView styling
+        offeredItemsTable.setStyle(
+            "-fx-background-color: white; " +
+            "-fx-border-color: #bdc3c7; " +
+            "-fx-border-width: 1px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-padding: 10px; " +
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2c3e50;"
+        );
+
+        // Table Column Header styling
+        for (TableColumn<OfferedItem, ?> column : offeredItemsTable.getColumns()) {
+            column.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-alignment: CENTER;");
+        }
+
+        // Alternating row colors
+        offeredItemsTable.setRowFactory(tv -> {
+            TableRow<OfferedItem> row = new TableRow<>() {
+                @Override
+                protected void updateItem(OfferedItem item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null) {
+                        setStyle("-fx-background-color: white;");
+                    } else {
+                        if (isSelected()) {
+                            setStyle("-fx-background-color: #ecf0f1;");  // Light gray for selected
+                        } else {
+                            setStyle("-fx-background-color: #ffffff;");  // White for regular
+                        }
+                    }
+                }
+            };
+
+            // Hover effect for rows
+            row.setOnMouseEntered(event -> row.setStyle("-fx-background-color: #ecf0f1;"));
+            row.setOnMouseExited(event -> row.setStyle("-fx-background-color: white;"));
+            return row;
+        });
+
+        // Bottom pane styling
+        bottomPane.setStyle("-fx-spacing: 10px;");
+
+        // Accept Offer Button styling
+        acceptOfferButton.setStyle(
+            "-fx-background-color: #27ae60; " +  // Green button
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        );
+        acceptOfferButton.setOnMouseEntered(e -> acceptOfferButton.setStyle(
+            "-fx-background-color: #229954; " +  // Darker green hover
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+        acceptOfferButton.setOnMouseExited(e -> acceptOfferButton.setStyle(
+            "-fx-background-color: #27ae60; " +  // Revert to original green
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+
+        // Decline Offer Button styling
+        declineOfferButton.setStyle(
+            "-fx-background-color: #e74c3c; " +  // Red button
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        );
+        declineOfferButton.setOnMouseEntered(e -> declineOfferButton.setStyle(
+            "-fx-background-color: #c0392b; " +  // Darker red hover
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+        declineOfferButton.setOnMouseExited(e -> declineOfferButton.setStyle(
+            "-fx-background-color: #e74c3c; " +  // Revert to original red
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-cursor: hand;"
+        ));
+
+        // Reason Field styling
+        reasonField.setStyle(
+            "-fx-background-color: #ffffff; " +
+            "-fx-border-color: #bdc3c7; " +
+            "-fx-border-width: 1px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-padding: 5px; " +
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2c3e50;"
+        );
     }
+
 
     public void refreshTableContent(ArrayList<OfferedItem> items) {
         if (items == null) {

@@ -35,10 +35,10 @@ public class MainViewController {
     private final double DEFAULT_WIDTH = 800;
     private final double DEFAULT_HEIGHT = 600;
     private final double LOGIN_WIDTH = 450;
-    private final double LOGIN_HEIGHT = 300;
+    private final double LOGIN_HEIGHT = 450;
     private final double FORM_VIEW_WIDTH = 450;
-    private final double FORM_VIEW_HEIGHT = 450;
-    private final double TABLE_VIEW_WIDTH = 825;
+    private final double FORM_VIEW_HEIGHT = 600;
+    private final double TABLE_VIEW_WIDTH = 1025;
     private final double TABLE_VIEW_HEIGHT = 675;
 
     // Properties

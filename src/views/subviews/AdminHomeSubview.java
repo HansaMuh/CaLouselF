@@ -24,7 +24,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
         init();
         setLayout();
         setTable();
-        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
+        setStyling(); 
     }
 
     // Properties
@@ -100,8 +100,98 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
     }
 
     private void setStyling() {
-        // TODO: Implement styling
+        // Styling untuk layout utama
+        setStyle("-fx-background-color: #f4f7fc; -fx-padding: 20px; -fx-spacing: 15px;");
+
+        // Styling tips area (label)
+        tipsArea.setStyle(
+            "-fx-font-size: 12px; " +
+            "-fx-text-fill: #7f8c8d; " +  // Light gray color
+            "-fx-padding: 10px 0 0 0;"
+        );
+
+        // Styling tombol
+        String buttonStyle =
+            "-fx-background-color: #28a745; " + // Green color for approve button
+            "-fx-text-fill: white; " +
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 14px; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-background-radius: 5px;" +
+            "-fx-cursor: hand;";
+
+        String declineButtonStyle =
+            "-fx-background-color: #dc3545; " + // Red color for decline button
+            "-fx-text-fill: white; " +
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 14px; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-background-radius: 5px;" +
+            "-fx-cursor: hand;";
+
+        approveItemButton.setStyle(buttonStyle);
+        declineItemButton.setStyle(declineButtonStyle);
+
+        // Hover efek untuk tombol
+        approveItemButton.setOnMouseEntered(e -> approveItemButton.setStyle(buttonStyle + "-fx-background-color: #218838;"));
+        approveItemButton.setOnMouseExited(e -> approveItemButton.setStyle(buttonStyle));
+
+        declineItemButton.setOnMouseEntered(e -> declineItemButton.setStyle(declineButtonStyle + "-fx-background-color: #c82333;"));
+        declineItemButton.setOnMouseExited(e -> declineItemButton.setStyle(declineButtonStyle));
+
+        // Styling alasan (reasonField)
+        reasonField.setStyle(
+            "-fx-border-color: #dcdcdc; " +
+            "-fx-padding: 5px; " +
+            "-fx-font-size: 14px;"
+        );
+
+        // Styling tabel
+        itemsTable.setStyle(
+            "-fx-background-color: white; " +
+            "-fx-border-color: #dcdcdc; " +
+            "-fx-border-radius: 10px; " +
+            "-fx-background-radius: 10px; " +
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2c3e50;" // Dark text
+        );
+
+        // Alternating row colors
+        itemsTable.setRowFactory(tv -> new TableRow<Item>() {
+            @Override
+            protected void updateItem(Item item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setStyle("-fx-background-color: white;");
+                } else if (getIndex() % 2 == 0) {
+                    setStyle("-fx-background-color: #f9f9f9;"); // Light gray for even rows
+                } else {
+                    setStyle("-fx-background-color: white;"); // White for odd rows
+                }
+            }
+        });
+
+        // Styling header kolom tabel
+        for (TableColumn<Item, ?> column : itemsTable.getColumns()) {
+            column.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #34495e;");
+        }
+
+        // Styling bottomPane
+        bottomPane.setStyle(
+            "-fx-background-color: #ffffff; " +
+            "-fx-padding: 10px; " +
+            "-fx-border-color: #e0e0e0; " +
+            "-fx-border-width: 1px 0 0 0; " +
+            "-fx-border-radius: 5px;"
+        );
+
+        // Styling untuk HBox di leftSideBox dan declineItemBox
+        leftSideBox.setStyle("-fx-spacing: 15px;");
+        declineItemBox.setStyle("-fx-spacing: 10px;");
     }
+
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {
