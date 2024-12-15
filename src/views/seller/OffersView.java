@@ -88,7 +88,10 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
         bottomPane.setSpacing(10);
         bottomPane.getChildren().addAll(acceptOfferButton, declineOfferBox);
 
+        declineOfferBox.setSpacing(10);
         declineOfferBox.getChildren().addAll(declineOfferButton, reasonField);
+
+        reasonField.setPrefWidth(200);
 
         getChildren().addAll(titleLabel, dashboardPane, offeredItemsTable, bottomPane);
     }
