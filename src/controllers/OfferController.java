@@ -5,7 +5,6 @@ import enums.OfferStatus;
 import models.Item;
 import models.Offer;
 import models.OfferedItem;
-import models.Transaction;
 import modules.Response;
 import singleton.Database;
 
@@ -129,7 +128,7 @@ public class OfferController {
     and create a transaction based on the offer.
     It returns a Response object containing the number of rows affected.
      */
-    public Response<Integer> acceptOffer(String id, String userId, String itemId) {
+    public Response<Integer> acceptOffer(String id, String itemId) {
         int rowsAffected = 0;
 
         String query = "UPDATE offers SET status = ? WHERE id = ?;";
@@ -157,8 +156,10 @@ public class OfferController {
             );
         }
 
+        Offer targetOffer = getOfferById(id);
+
         TransactionController transactionController = new TransactionController();
-        Response<Integer> transactionResponse = transactionController.purchaseItem(userId, itemId);
+        Response<Integer> transactionResponse = transactionController.purchaseItem(targetOffer.getUserId(), itemId);
 
         return new Response<>(
                 true,
@@ -172,7 +173,7 @@ public class OfferController {
     and sets the reason for declining on the offer.
     It returns a Response object containing the number of rows affected.
      */
-    public Response<Integer> declineOffer(String id, String userId, String itemId, String reason) {
+    public Response<Integer> declineOffer(String id, String reason) {
         String errorMessage = validateReason(reason);
 
         if (!errorMessage.isEmpty()) {
@@ -210,6 +211,38 @@ public class OfferController {
     }
 
     // Utilities
+
+    /*
+    This method is used to get an offer from the database based on its ID.
+    It returns an Offer.
+     */
+    private Offer getOfferById(String id) {
+        Offer offer = null;
+
+        String query = "SELECT * FROM offers WHERE id = ?;";
+
+        try {
+            PreparedStatement statement = database.prepareStatement(query, id);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                offer = new Offer(
+                        resultSet.getString("id"),
+                        resultSet.getString("user_id"),
+                        resultSet.getString("item_id"),
+                        resultSet.getDouble("price"),
+                        resultSet.getDate("date"),
+                        OfferStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getString("reason")
+                );
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return offer;
+    }
 
     /*
     This method is used to get the latest offer from the database.

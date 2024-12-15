@@ -283,7 +283,7 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
             return;
         }
 
-        Response<Integer> response = offerController.acceptOffer(item.getOfferId(), currentUser.getId(), item.getId());
+        Response<Integer> response = offerController.acceptOffer(item.getOfferId(), item.getId());
 
         MainViewController.getInstance(null).showAlert(
                 response.getIsSuccess(),
@@ -302,8 +302,8 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
         }
 
         String reason = reasonField.getText();
-        Response<Integer> response = offerController.declineOffer(item.getOfferId(), currentUser.getId(),
-                item.getId(), reason);
+        Response<Integer> response = offerController.declineOffer(item.getOfferId(),
+                reason);
 
         MainViewController.getInstance(null).showAlert(
                 response.getIsSuccess(),
