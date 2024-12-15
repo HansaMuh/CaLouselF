@@ -18,11 +18,16 @@ public class Main extends Application {
     private Stage primaryStage;
 
     // Overrides
+
+    /*
+    This method is called when the application is launched, where it creates the View system and starts
+    by navigating to the Login view.
+     */
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.primaryStage.setWidth(450);
-        this.primaryStage.setHeight(300);
+        this.primaryStage.setHeight(450);
 
         MainViewController viewController = MainViewController.getInstance(primaryStage);
         viewController.navigateTo(LoginView.class);

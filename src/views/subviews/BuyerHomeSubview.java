@@ -20,6 +20,12 @@ import views.buyer.WishlistView;
 
 import java.util.ArrayList;
 
+/*
+    BuyerHomeSubview is used to display the main view for buyers.
+    This displays a table of available items, and provides buttons to add items to wishlist, purchase items, and make offers.
+    Not only those, it lso provides buttons to view wishlist and purchase history.
+    It's the first view that buyers see when they log in.
+ */
 public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
@@ -127,10 +133,8 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
     }
 
     private void setStyling() {
-        // Main layout styling (VBox)
         setStyle("-fx-background-color: #f4f7fc; -fx-padding: 20px; -fx-spacing: 15px;");
 
-        // Button styling
         String buttonStyle =
             "-fx-background-color: #3f51b5; " +
             "-fx-text-fill: white; " +
@@ -148,15 +152,12 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
         for (Button button : buttons) {
             button.setStyle(buttonStyle);
 
-            // Hover effect
             button.setOnMouseEntered(e -> button.setStyle(buttonStyle + hoverStyle));
             button.setOnMouseExited(e -> button.setStyle(buttonStyle));
         }
 
-        // Styling offer field
         offerField.setStyle("-fx-border-color: #dcdcdc; -fx-padding: 5px; -fx-font-size: 14px;");
 
-        // Styling table
         itemsTable.setStyle(
             "-fx-background-color: white; " +
             "-fx-border-color: #dcdcdc; " +
@@ -166,7 +167,6 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
             "-fx-text-fill: #2c3e50;"
         );
 
-        // Add alternating row colors
         itemsTable.setRowFactory(tv -> new TableRow<Item>() {
             @Override
             protected void updateItem(Item item, boolean empty) {
@@ -181,7 +181,6 @@ public class BuyerHomeSubview extends VBox implements EventHandler<ActionEvent> 
             }
         });
 
-        // Styling table header
         for (TableColumn<Item, ?> column : itemsTable.getColumns()) {
             column.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #34495e;");
         }

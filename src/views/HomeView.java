@@ -21,6 +21,11 @@ import views.subviews.SellerHomeSubview;
 
 import java.util.ArrayList;
 
+/*
+    HomeView is used to display the main dashboard of the application.
+    It contains a top-level menu, a title, a caption, a search bar, and a subview that is specific
+    to the current user's role.
+ */
 public class HomeView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
@@ -31,7 +36,7 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
 
         init();
         setLayout();
-        setStyling(); // Uncomment kalau sudah ada metode setStyling
+        setStyling();
     }
 
     // Properties
@@ -105,41 +110,32 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setStyling() {
-        // Styling for the main container (VBox)
         this.setStyle("-fx-background-color: #f5f5f5; -fx-padding: 20px; -fx-spacing: 20px;");
 
-        // Styling for the top level menu (HBox with logout button)
         topLevelMenu.setStyle("-fx-background-color: #00796b; -fx-padding: 10px; -fx-alignment: center-right;");
         logoutButton.setStyle("-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;");
         logoutButton.setOnMouseEntered(e -> logoutButton.setStyle("-fx-background-color: #c62828; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
         logoutButton.setOnMouseExited(e -> logoutButton.setStyle("-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
 
-        // Styling for the title label
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #00796b;");
 
-        // Styling for the caption label
         captionLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #616161; -fx-padding: 5px 0;");
 
-        // Styling for the browse section (HBox with TextField and Browse Button)
         browseBox.setStyle("-fx-spacing: 10px;");
         browseField.setStyle("-fx-font-size: 14px; -fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-padding: 5px;");
         browseButton.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;");
         browseButton.setOnMouseEntered(e -> browseButton.setStyle("-fx-background-color: #0277bd; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
         browseButton.setOnMouseExited(e -> browseButton.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
 
-        // Styling for the BorderPane that contains the caption and browse section
         dashboardPane.setStyle("-fx-background-color: #ffffff; -fx-padding: 15px; -fx-border-color: #e0e0e0; -fx-border-width: 1px;");
 
-        // Styling for the content of the current subview (SellerHomeSubview, BuyerHomeSubview, or AdminHomeSubview)
         if (currentSubview != null) {
-            currentSubview.setStyle("-fx-background-color: #ffffff; -fx-padding: 20px; -fx-border-radius: 5px; -fx-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);");
+            currentSubview.setStyle("-fx-background-color: #ffffff; -fx-padding: 20px; -fx-border-radius: 5px;");
         }
 
-        // Optional: Hover effect for the "Browse" button
         browseButton.setOnMouseEntered(e -> browseButton.setStyle("-fx-background-color: #0277bd; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
         browseButton.setOnMouseExited(e -> browseButton.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
     }
-
 
     // Helpers
 

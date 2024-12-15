@@ -1,5 +1,13 @@
 package modules;
 
+/*
+    ViewInfo class is used to store details about a view in the application, such as:
+    - name: the display name of the view
+    - width: the actual width of the view
+    - height: the actual height of the view
+    - isBottomLevel: a boolean value indicating whether the view is a bottom-level view or not
+    (in other words, indicating whether it needs to have a Back button for navigation)
+ */
 public class ViewInfo {
 
     // Constructor

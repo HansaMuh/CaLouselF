@@ -10,9 +10,14 @@ import javafx.scene.layout.VBox;
 import modules.Response;
 import view_controllers.MainViewController;
 
+/*
+    RegisterView is used to display the registration form for new users.
+    It contains fields for username, password, phone number, address, and role.
+ */
 public class RegisterView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
+
     public RegisterView() {
         this.userController = new UserController();
 
@@ -22,6 +27,7 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
     }
 
     // Properties
+
     private UserController userController;
 
     private Label titleLabel;
@@ -118,35 +124,28 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setStyling() {
-        // Styling for titleLabel
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF50; -fx-margin-bottom: 10px;");
 
-        // Styling for captionLabel
         captionLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #555555; -fx-margin-bottom: 20px;");
 
-        // Styling for formGrid
         formGrid.setStyle("-fx-background-color: #f9f9f9; -fx-border-radius: 8px; -fx-padding: 15px;");
         formGrid.setVgap(15);
         formGrid.setHgap(10);
 
-        // Styling for usernameField, passwordField, phoneField, and addressField
         usernameField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
         passwordField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
         phoneField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
         addressField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
 
-        // Styling for labels
         usernameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
         passwordLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
         phoneLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
         addressLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
         roleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
 
-        // Styling for radio buttons (Seller, Buyer)
         sellerRadio.setStyle("-fx-font-size: 14px; -fx-text-fill: #555555;");
         buyerRadio.setStyle("-fx-font-size: 14px; -fx-text-fill: #555555;");
 
-        // Styling for registerButton
         registerButton.setStyle(
                 "-fx-background-color: #4CAF50; " +
                 "-fx-text-fill: white; " +
@@ -155,7 +154,6 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
                 "-fx-padding: 10px; " +
                 "-fx-font-weight: bold;");
 
-        // Hover effects for registerButton
         registerButton.setOnMouseEntered(e -> registerButton.setStyle(
                 "-fx-background-color: #45a049; " +
                 "-fx-text-fill: white; " +
@@ -172,7 +170,6 @@ public class RegisterView extends VBox implements EventHandler<ActionEvent> {
                 "-fx-padding: 10px; " +
                 "-fx-font-weight: bold;"));
 
-        // Additional background and layout styling for VBox
         setStyle("-fx-background-color: #eeeeee; -fx-padding: 25px; -fx-alignment: center;");
         setSpacing(20);
     }

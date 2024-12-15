@@ -17,6 +17,10 @@ import view_controllers.MainViewController;
 
 import java.util.ArrayList;
 
+/*
+    OffersView is used to display the items that has been offered by a buyer to the seller.
+    The seller can accept or decline the offers.
+ */
 public class OffersView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
@@ -111,25 +115,21 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setStyling() {
-        // Main VBox styling
         setStyle("-fx-background-color: #f9f9f9; -fx-padding: 20px; -fx-spacing: 15px;");
 
-        // Title Label styling
         titleLabel.setStyle(
             "-fx-font-size: 24px; " +
             "-fx-font-weight: bold; " +
-            "-fx-text-fill: #34495e; " +  // Dark title color
+            "-fx-text-fill: #34495e; " +
             "-fx-padding: 10px 0;"
         );
 
-        // Caption Label styling
         captionLabel.setStyle(
             "-fx-font-size: 14px; " +
-            "-fx-text-fill: #7f8c8d; " +  // Subtle gray for captions
+            "-fx-text-fill: #7f8c8d; " +
             "-fx-padding: 5px 0;"
         );
 
-        // TableView styling
         offeredItemsTable.setStyle(
             "-fx-background-color: white; " +
             "-fx-border-color: #bdc3c7; " +
@@ -140,12 +140,10 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
             "-fx-text-fill: #2c3e50;"
         );
 
-        // Table Column Header styling
         for (TableColumn<OfferedItem, ?> column : offeredItemsTable.getColumns()) {
             column.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-alignment: CENTER;");
         }
 
-        // Alternating row colors
         offeredItemsTable.setRowFactory(tv -> {
             TableRow<OfferedItem> row = new TableRow<>() {
                 @Override
@@ -163,18 +161,16 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
                 }
             };
 
-            // Hover effect for rows
             row.setOnMouseEntered(event -> row.setStyle("-fx-background-color: #ecf0f1;"));
             row.setOnMouseExited(event -> row.setStyle("-fx-background-color: white;"));
+
             return row;
         });
 
-        // Bottom pane styling
         bottomPane.setStyle("-fx-spacing: 10px;");
 
-        // Accept Offer Button styling
         acceptOfferButton.setStyle(
-            "-fx-background-color: #27ae60; " +  // Green button
+            "-fx-background-color: #27ae60; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -183,7 +179,7 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         );
         acceptOfferButton.setOnMouseEntered(e -> acceptOfferButton.setStyle(
-            "-fx-background-color: #229954; " +  // Darker green hover
+            "-fx-background-color: #229954; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -192,7 +188,7 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         ));
         acceptOfferButton.setOnMouseExited(e -> acceptOfferButton.setStyle(
-            "-fx-background-color: #27ae60; " +  // Revert to original green
+            "-fx-background-color: #27ae60; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -201,9 +197,8 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         ));
 
-        // Decline Offer Button styling
         declineOfferButton.setStyle(
-            "-fx-background-color: #e74c3c; " +  // Red button
+            "-fx-background-color: #e74c3c; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -212,7 +207,7 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         );
         declineOfferButton.setOnMouseEntered(e -> declineOfferButton.setStyle(
-            "-fx-background-color: #c0392b; " +  // Darker red hover
+            "-fx-background-color: #c0392b; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -221,7 +216,7 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         ));
         declineOfferButton.setOnMouseExited(e -> declineOfferButton.setStyle(
-            "-fx-background-color: #e74c3c; " +  // Revert to original red
+            "-fx-background-color: #e74c3c; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -230,7 +225,6 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         ));
 
-        // Reason Field styling
         reasonField.setStyle(
             "-fx-background-color: #ffffff; " +
             "-fx-border-color: #bdc3c7; " +
@@ -241,7 +235,6 @@ public class OffersView extends VBox implements EventHandler<ActionEvent> {
             "-fx-text-fill: #2c3e50;"
         );
     }
-
 
     public void refreshTableContent(ArrayList<OfferedItem> items) {
         if (items == null) {

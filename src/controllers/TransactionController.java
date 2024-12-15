@@ -28,10 +28,15 @@ public class TransactionController {
     
     // Methods
 
+    /*
+    This method is used to get all transactional items by user ID from the database.
+    It returns a Response object containing an array list of Transactional Items.
+     */
     public Response<ArrayList<TransactionalItem>> getItemsByTransaction(String userId) {
         ArrayList<TransactionalItem> items = new ArrayList<>();
 
         String query = "SELECT t.id AS transaction_id, i.* FROM transactions AS t LEFT JOIN items AS i ON t.item_id = i.id WHERE t.user_id = ?;";
+
         try {
             PreparedStatement statement = database.prepareStatement(query, userId);
 
@@ -54,6 +59,11 @@ public class TransactionController {
         );
     }
 
+    /*
+    This method is used to purchase an item by updating its status to SOLD_OUT in the database,
+    and create a transaction based on the item.
+    It returns a Response object containing the number of rows affected.
+     */
     public Response<Integer> purchaseItem(String userId, String itemId) {
         int rowsAffected = 0;
 
@@ -93,6 +103,11 @@ public class TransactionController {
 
     // Utilities
 
+    /*
+    This method is used to get the latest transaction available from the database.
+    It works by querying the database for the latest transaction with the highest ID number (on a descending list).
+    It returns a Transaction.
+     */
     public Transaction getLatestTransactionFromDatabase() {
         Transaction transaction = null;
 
@@ -102,7 +117,6 @@ public class TransactionController {
             PreparedStatement statement = database.prepareStatement(query);
 
             ResultSet resultSet = statement.executeQuery();
-
             if (resultSet.next()) {
                 transaction = new Transaction(
                         resultSet.getString("id"),
@@ -119,6 +133,10 @@ public class TransactionController {
         return transaction;
     }
 
+    /*
+    This method is used to get all transactional items from a result set.
+    It returns an array list of Transactional Items.
+     */
     public ArrayList<TransactionalItem> getTransactionalItemsFromResultSet(ResultSet resultSet) {
         ArrayList<TransactionalItem> items = new ArrayList<>();
 

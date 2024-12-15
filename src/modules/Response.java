@@ -1,5 +1,12 @@
 package modules;
 
+/*
+    Response class is used to return an interaction response from the server to the client.
+    It contains three properties:
+    - isSuccess: a boolean value that indicates whether the operation was successful or not.
+    - message: a string that contains a message that describes the result of the operation.
+    - output: a generic object that contains the result of the operation.
+ */
 public class Response<T> {
 
     // Constructor

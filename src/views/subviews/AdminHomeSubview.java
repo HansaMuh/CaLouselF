@@ -14,6 +14,11 @@ import view_controllers.MainViewController;
 
 import java.util.ArrayList;
 
+/*
+    AdminHomeSubview is used to display the home view for admins. It includes a list of items requested by sellers.
+    Admin can approve or decline an item from this view.
+    It's the first view that admin will see after logging in.
+ */
 public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
@@ -100,19 +105,16 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
     }
 
     private void setStyling() {
-        // Styling untuk layout utama
         setStyle("-fx-background-color: #f4f7fc; -fx-padding: 20px; -fx-spacing: 15px;");
 
-        // Styling tips area (label)
         tipsArea.setStyle(
             "-fx-font-size: 12px; " +
-            "-fx-text-fill: #7f8c8d; " +  // Light gray color
+            "-fx-text-fill: #7f8c8d; " +
             "-fx-padding: 10px 0 0 0;"
         );
 
-        // Styling tombol
         String buttonStyle =
-            "-fx-background-color: #28a745; " + // Green color for approve button
+            "-fx-background-color: #28a745; " +
             "-fx-text-fill: white; " +
             "-fx-font-weight: bold; " +
             "-fx-font-size: 14px; " +
@@ -122,7 +124,7 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
             "-fx-cursor: hand;";
 
         String declineButtonStyle =
-            "-fx-background-color: #dc3545; " + // Red color for decline button
+            "-fx-background-color: #dc3545; " +
             "-fx-text-fill: white; " +
             "-fx-font-weight: bold; " +
             "-fx-font-size: 14px; " +
@@ -134,31 +136,27 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
         approveItemButton.setStyle(buttonStyle);
         declineItemButton.setStyle(declineButtonStyle);
 
-        // Hover efek untuk tombol
         approveItemButton.setOnMouseEntered(e -> approveItemButton.setStyle(buttonStyle + "-fx-background-color: #218838;"));
         approveItemButton.setOnMouseExited(e -> approveItemButton.setStyle(buttonStyle));
 
         declineItemButton.setOnMouseEntered(e -> declineItemButton.setStyle(declineButtonStyle + "-fx-background-color: #c82333;"));
         declineItemButton.setOnMouseExited(e -> declineItemButton.setStyle(declineButtonStyle));
 
-        // Styling alasan (reasonField)
         reasonField.setStyle(
             "-fx-border-color: #dcdcdc; " +
             "-fx-padding: 5px; " +
             "-fx-font-size: 14px;"
         );
 
-        // Styling tabel
         itemsTable.setStyle(
             "-fx-background-color: white; " +
             "-fx-border-color: #dcdcdc; " +
             "-fx-border-radius: 10px; " +
             "-fx-background-radius: 10px; " +
             "-fx-font-size: 14px; " +
-            "-fx-text-fill: #2c3e50;" // Dark text
+            "-fx-text-fill: #2c3e50;"
         );
 
-        // Alternating row colors
         itemsTable.setRowFactory(tv -> new TableRow<Item>() {
             @Override
             protected void updateItem(Item item, boolean empty) {
@@ -173,12 +171,10 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
             }
         });
 
-        // Styling header kolom tabel
         for (TableColumn<Item, ?> column : itemsTable.getColumns()) {
             column.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #34495e;");
         }
 
-        // Styling bottomPane
         bottomPane.setStyle(
             "-fx-background-color: #ffffff; " +
             "-fx-padding: 10px; " +
@@ -187,11 +183,9 @@ public class AdminHomeSubview extends VBox implements EventHandler<ActionEvent> 
             "-fx-border-radius: 5px;"
         );
 
-        // Styling untuk HBox di leftSideBox dan declineItemBox
         leftSideBox.setStyle("-fx-spacing: 15px;");
         declineItemBox.setStyle("-fx-spacing: 10px;");
     }
-
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {

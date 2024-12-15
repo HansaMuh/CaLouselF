@@ -2,6 +2,9 @@ package models;
 
 import java.util.Date;
 
+/*
+    Transaction class represents a transaction record in the system relating to an item purchase history.
+ */
 public class Transaction {
 
     // Constructor

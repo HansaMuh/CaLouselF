@@ -18,15 +18,21 @@ import java.util.Calendar;
 public class OfferController {
 
     // Constructor
+
     public OfferController() {
         database = Database.getInstance();
     }
 
     // Properties
+
     private Database database;
 
     // Methods
 
+    /*
+    This method is used to get all offered items made to a specific seller from the database.
+    It returns a Response object containing an array list of Offered Items.
+     */
     public Response<ArrayList<OfferedItem>> getOfferedItems(String sellerId) {
         ArrayList<OfferedItem> items = new ArrayList<>();
 
@@ -37,9 +43,11 @@ public class OfferController {
 
         try {
             PreparedStatement statement = database.prepareStatement(query, status, sellerId);
+
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getOfferedItemsFromResultSet(resultSet));
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
@@ -55,6 +63,10 @@ public class OfferController {
         );
     }
 
+    /*
+    This method is used to create an offer to an item with PENDING status and insert it into the database.
+    It returns a Response object containing the number of rows affected.
+     */
     public Response<Integer> makeOffer(String userId, String itemId, String price) {
         String errorMessage = validatePrice(price);
 
@@ -79,7 +91,6 @@ public class OfferController {
 
         int rowsAffected = 0;
 
-        // Ambil offer terakhir dari database
         Offer latestOffer = getLatestOfferFromDatabase();
         int latestId = 0;
         if (latestOffer != null) {
@@ -87,15 +98,17 @@ public class OfferController {
         }
 
         String offerQuery = "INSERT INTO offers (id, user_id, item_id, price, date, status, reason) VALUES (?, ?, ?, ?, ?, ?, ?);";
-        String newId = String.format("OID%04d", latestId + 1);
+        String id = String.format("OID%04d", latestId + 1);
         Date date = new Date(Calendar.getInstance().getTime().getTime());
         String status = OfferStatus.PENDING.toString();
         String reason = "";
 
         try {
-            PreparedStatement statement = database.prepareStatement(offerQuery, newId, userId, itemId, priceNumber, date, status, reason);
+            PreparedStatement statement = database.prepareStatement(offerQuery, id, userId, itemId, priceNumber, date, status, reason);
+
             rowsAffected = statement.executeUpdate();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
@@ -111,6 +124,11 @@ public class OfferController {
         );
     }
 
+    /*
+    This method is used to accept an offer made to an item by updating its status to ACCEPTED in the database,
+    and create a transaction based on the offer.
+    It returns a Response object containing the number of rows affected.
+     */
     public Response<Integer> acceptOffer(String id, String userId, String itemId) {
         int rowsAffected = 0;
 
@@ -119,8 +137,10 @@ public class OfferController {
 
         try {
             PreparedStatement statement = database.prepareStatement(query, status, id);
+
             rowsAffected = statement.executeUpdate();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
@@ -137,7 +157,6 @@ public class OfferController {
             );
         }
 
-        // Lanjutkan dengan melakukan purchase
         TransactionController transactionController = new TransactionController();
         Response<Integer> transactionResponse = transactionController.purchaseItem(userId, itemId);
 
@@ -148,6 +167,11 @@ public class OfferController {
         );
     }
 
+    /*
+    This method is used to decline an offer made to an item by updating its status to DECLINED in the database,
+    and sets the reason for declining on the offer.
+    It returns a Response object containing the number of rows affected.
+     */
     public Response<Integer> declineOffer(String id, String userId, String itemId, String reason) {
         String errorMessage = validateReason(reason);
 
@@ -166,8 +190,10 @@ public class OfferController {
 
         try {
             PreparedStatement statement = database.prepareStatement(query, status, reason, id);
+
             rowsAffected = statement.executeUpdate();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             return new Response<>(
                     false,
@@ -185,16 +211,20 @@ public class OfferController {
 
     // Utilities
 
+    /*
+    This method is used to get the latest offer from the database.
+    It works by querying the database to get the offer based on the highest ID number (on a descending list).
+    It returns an Offer.
+     */
     private Offer getLatestOfferFromDatabase() {
         Offer offer = null;
 
-        // Perbaiki query untuk mengambil semua kolom
         String query = "SELECT * FROM offers ORDER BY id DESC LIMIT 1;";
 
         try {
             PreparedStatement statement = database.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
 
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 offer = new Offer(
                         resultSet.getString("id"),
@@ -206,13 +236,19 @@ public class OfferController {
                         resultSet.getString("reason")
                 );
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
 
         return offer;
     }
 
+    /*
+    This method is used to get the highest priced offer made to an item from the database.
+    It works by querying the database to get the offer based on the highest price (on a descending list).
+    It returns an Offer.
+     */
     private Offer getHighestOfferByItem(String itemId) {
         Offer offer = null;
 
@@ -220,8 +256,8 @@ public class OfferController {
 
         try {
             PreparedStatement statement = database.prepareStatement(query, itemId);
-            ResultSet resultSet = statement.executeQuery();
 
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 offer = new Offer(
                         resultSet.getString("id"),
@@ -233,13 +269,18 @@ public class OfferController {
                         resultSet.getString("reason")
                 );
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
 
         return offer;
     }
 
+    /*
+    This method is used to get an item from the database based on its ID.
+    It returns an Item.
+     */
     private Item getItemFromDatabase(String itemId) {
         Item item = null;
 
@@ -247,8 +288,8 @@ public class OfferController {
 
         try {
             PreparedStatement statement = database.prepareStatement(query, itemId);
-            ResultSet resultSet = statement.executeQuery();
 
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 item = new Item(
                         resultSet.getString("id"),
@@ -261,13 +302,18 @@ public class OfferController {
                         resultSet.getString("note")
                 );
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
 
         return item;
     }
 
+    /*
+    This method is used to get offered items from a ResultSet.
+    It returns an array list of Offered Items.
+     */
     private ArrayList<OfferedItem> getOfferedItemsFromResultSet(ResultSet resultSet) {
         ArrayList<OfferedItem> items = new ArrayList<>();
 
@@ -285,9 +331,11 @@ public class OfferController {
                         ItemStatus.valueOf(resultSet.getString("status")),
                         resultSet.getString("note")
                 );
+
                 items.add(item);
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -296,6 +344,10 @@ public class OfferController {
 
     // Validations
 
+    /*
+    This method is used to validate an offer's price on whether it is empty, less than or equal to 0, or not a number.
+    It returns an error message if the validation fails.
+     */
     private String validatePrice(String price) {
         String errorMessage = "";
 
@@ -305,16 +357,23 @@ public class OfferController {
 
         try {
             double value = Double.parseDouble(price);
+
             if (value <= 0) {
                 errorMessage += "- Price must be greater than 0.\r\n";
             }
-        } catch (NumberFormatException ex) {
+        }
+        catch (NumberFormatException ex) {
             errorMessage += "- Price must be a valid number.\r\n";
         }
 
         return errorMessage;
     }
 
+    /*
+    This method is used to validate an offer on whether it is higher than the current highest offer or lower than the
+    item price.
+    It returns an error message if the validation fails.
+     */
     private String validateOffer(String itemId, double price) {
         String errorMessage = "";
 
@@ -322,7 +381,8 @@ public class OfferController {
 
         if (highestOffer != null && price < highestOffer.getPrice()) {
             errorMessage += "- Offer must be higher than the current highest offer that is " + highestOffer.getPrice() + ".\r\n";
-        } else if (highestOffer == null) {
+        }
+        else if (highestOffer == null) {
             Item item = getItemFromDatabase(itemId);
 
             if (item != null && price > item.getPrice()) {
@@ -333,11 +393,17 @@ public class OfferController {
         return errorMessage;
     }
 
+    /*
+    This method is used to validate an offer's reason on whether it is empty.
+    It returns an error message if the validation fails.
+     */
     private String validateReason(String reason) {
         String errorMessage = "";
+
         if (reason.isEmpty()) {
             errorMessage += "- Reason cannot be empty.\r\n";
         }
+
         return errorMessage;
     }
 

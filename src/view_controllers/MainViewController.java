@@ -17,6 +17,10 @@ import views.seller.SellerItemsView;
 import java.util.HashMap;
 import java.util.Stack;
 
+/*
+    MainViewController class is used to manage the navigation between different views on an application window.
+    It uses the Singleton pattern to ensure that only one instance of the class is created.
+ */
 public class MainViewController {
 
     // Constructor
@@ -60,12 +64,18 @@ public class MainViewController {
 
     // Utilities
 
+    /*
+        Initializes the fields of the class.
+     */
     private void init() {
         mainView = new MainView(stage);
         pages = new Stack<>();
         viewMap = new HashMap<>();
     }
 
+    /*
+        Sets the views that can be navigated to.
+     */
     private void setViews() {
         viewMap.put(LoginView.class, new ViewInfo("Log In", LOGIN_WIDTH, LOGIN_HEIGHT, false));
         viewMap.put(RegisterView.class, new ViewInfo("Register Account", FORM_VIEW_WIDTH, FORM_VIEW_HEIGHT, true));
@@ -80,10 +90,16 @@ public class MainViewController {
 
     // Helper
 
+    /*
+        Checks if the view is multilayered (i.e. contains multiple pages in an instance).
+     */
     private boolean isViewMultilayered() {
         return pages.size() > 1;
     }
 
+    /*
+        Refreshes the stage properties based on the latest page.
+     */
     private void refresh() {
         ViewInfo info = viewMap.get(pages.lastElement().getClass());
 
@@ -103,6 +119,9 @@ public class MainViewController {
 
     // Methods
 
+    /*
+        Shows an alert dialog with the specified title and message.
+     */
     public void showAlert(boolean isSuccess, String title, String message) {
         Alert.AlertType alertType = isSuccess ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR;
 
@@ -114,6 +133,9 @@ public class MainViewController {
         alert.showAndWait();
     }
 
+    /*
+        Navigates to the specified view. Primarily used by the Back button.
+     */
     public void navigateBack() {
         if (isViewMultilayered()) {
             pages.pop();
@@ -123,6 +145,9 @@ public class MainViewController {
         refresh();
     }
 
+    /*
+        Navigates to the specified view, by using its class and optional arguments (if needed for the constructor).
+     */
     public void navigateTo(Class<? extends VBox> viewClass, Object... args) {
         try {
             VBox view = null;

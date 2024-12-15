@@ -21,6 +21,10 @@ import view_controllers.MainViewController;
 
 import java.util.ArrayList;
 
+/*
+    WishlistView class is used to display the wishlist of the current user.
+    It displays the items that the user has added to their wishlist.
+ */
 public class WishlistView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
@@ -101,36 +105,31 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setStyling() {
-        // Main layout styling (VBox)
         setStyle("-fx-background-color: #f9f9f9; -fx-padding: 20px; -fx-spacing: 15px;");
 
-        // Title Label styling
         titleLabel.setStyle(
             "-fx-font-size: 24px; " +
             "-fx-font-weight: bold; " +
-            "-fx-text-fill: #2c3e50; " +  // Dark blue-gray color for title
+            "-fx-text-fill: #2c3e50; " +
             "-fx-padding: 10px 0;"
         );
 
-        // Caption Label styling
         captionLabel.setStyle(
             "-fx-font-size: 14px; " +
-            "-fx-text-fill: #7f8c8d; " +  // Soft gray for caption text
+            "-fx-text-fill: #7f8c8d; " +
             "-fx-padding: 5px 0;"
         );
 
-        // Styling for the TableView
         wishlistTable.setStyle(
             "-fx-background-color: white; " +
             "-fx-border-radius: 8px; " +
-            "-fx-border-color: #dfe6e9; " +  // Light gray border
+            "-fx-border-color: #dfe6e9; " +
             "-fx-border-width: 1px; " +
             "-fx-padding: 10px; " +
             "-fx-font-size: 14px; " +
-            "-fx-text-fill: #2c3e50;"  // Dark blue-gray for text
+            "-fx-text-fill: #2c3e50;"
         );
 
-        // Styling Table Rows for Alternating Colors
         wishlistTable.setRowFactory(tv -> {
             TableRow<Item> row = new TableRow<>() {
                 @Override
@@ -147,17 +146,17 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
                     }
                 }
             };
-            row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #d1f2eb;")); // Hover effect
-            row.setOnMouseExited(e -> row.setStyle("")); // Reset on hover exit
+
+            row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #d1f2eb;"));
+            row.setOnMouseExited(e -> row.setStyle(""));
+
             return row;
         });
 
-        // Styling TableView Columns
         for (TableColumn<Item, ?> column : wishlistTable.getColumns()) {
             column.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-size: 14px;");
         }
 
-        // Remove Button styling
         removeButton.setStyle(
             "-fx-background-color: #e74c3c; " +  // Red color for remove button
             "-fx-text-fill: white; " +
@@ -168,7 +167,6 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         );
 
-        // Button hover effect
         removeButton.setOnMouseEntered(e -> 
             removeButton.setStyle(
                 "-fx-background-color: #c0392b; " +  // Darker red on hover
@@ -193,7 +191,6 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
             )
         );
 
-        // Button click effect
         removeButton.setOnMousePressed(e -> 
             removeButton.setStyle(
                 "-fx-background-color: #c0392b; " +  // Darker red when clicked
@@ -218,7 +215,6 @@ public class WishlistView extends VBox implements EventHandler<ActionEvent> {
             )
         );
     }
-
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {

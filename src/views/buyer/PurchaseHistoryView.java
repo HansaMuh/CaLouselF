@@ -20,6 +20,10 @@ import view_controllers.MainViewController;
 
 import java.util.ArrayList;
 
+/*
+    PurchaseHistoryView class is used to display the purchase history of the current user.
+    It displays the items that the user has purchased based on their transactions.
+ */
 public class PurchaseHistoryView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
@@ -97,36 +101,31 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
     }
 
     private void setStyling() {
-        // Main layout styling (VBox)
         setStyle("-fx-background-color: #f9f9f9; -fx-padding: 20px; -fx-spacing: 15px;");
 
-        // Title Label styling
         titleLabel.setStyle(
             "-fx-font-size: 24px; " +
             "-fx-font-weight: bold; " +
-            "-fx-text-fill: #34495e; " +  // Dark blue-gray for title
+            "-fx-text-fill: #34495e; " +
             "-fx-padding: 10px 0;"
         );
 
-        // Caption Label styling
         captionLabel.setStyle(
             "-fx-font-size: 14px; " +
-            "-fx-text-fill: #7f8c8d; " +  // Soft gray for caption text
+            "-fx-text-fill: #7f8c8d; " +
             "-fx-padding: 5px 0;"
         );
 
-        // Styling for the TableView
         transactionalItemsTable.setStyle(
             "-fx-background-color: white; " +
             "-fx-border-radius: 8px; " +
-            "-fx-border-color: #dfe6e9; " +  // Light gray border
+            "-fx-border-color: #dfe6e9; " +
             "-fx-border-width: 1px; " +
             "-fx-padding: 10px; " +
             "-fx-font-size: 14px; " +
-            "-fx-text-fill: #2c3e50;"  // Dark blue-gray for text
+            "-fx-text-fill: #2c3e50;"
         );
 
-        // Styling Table Rows for Alternating Colors
         transactionalItemsTable.setRowFactory(tv -> {
             TableRow<TransactionalItem> row = new TableRow<>() {
                 @Override
@@ -143,17 +142,17 @@ public class PurchaseHistoryView extends VBox implements EventHandler<ActionEven
                     }
                 }
             };
-            row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #d1f2eb;")); // Hover effect
-            row.setOnMouseExited(e -> row.setStyle("")); // Reset on hover exit
+
+            row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #d1f2eb;"));
+            row.setOnMouseExited(e -> row.setStyle(""));
+
             return row;
         });
 
-        // Styling TableView Columns
         for (TableColumn<TransactionalItem, ?> column : transactionalItemsTable.getColumns()) {
             column.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-size: 14px;");
         }
     }
-
 
     public void refreshTableContent(ArrayList<TransactionalItem> items) {
         if (items == null) {

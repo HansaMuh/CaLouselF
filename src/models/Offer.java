@@ -4,6 +4,9 @@ import enums.OfferStatus;
 
 import java.util.Date;
 
+/*
+    Offer class represents an offer made by a buyer to purchase an item.
+ */
 public class Offer {
 
     // Constructor

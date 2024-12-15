@@ -2,6 +2,9 @@ package models;
 
 import enums.UserRole;
 
+/*
+    User class represents a user in the system that is either a Seller, Buyer, or an Admin.
+ */
 public class User {
 
     // Constructor

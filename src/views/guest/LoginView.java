@@ -16,9 +16,14 @@ import singleton.UserAuthenticator;
 import view_controllers.MainViewController;
 import views.HomeView;
 
+/*
+    LoginView is a view class that is responsible for rendering the login form.
+    It is the first view that the user sees when they open the application.
+ */
 public class LoginView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
+
     public LoginView() {
         this.userController = new UserController();
 
@@ -28,6 +33,7 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
     }
 
     // Properties
+
     private UserController userController;
 
     private Label titleLabel;
@@ -91,38 +97,28 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
         buttonGrid.add(loginButton, 0, 0);
         buttonGrid.add(navigateToRegisterButton, 1, 0);
 
-        loginButton.setPrefWidth(75);
-        navigateToRegisterButton.setPrefWidth(125);
-
         getChildren().addAll(titleLabel, captionLabel, formGrid, buttonGrid);
     }
 
     private void setStyling() {
-        // Styling for titleLabel
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF50; -fx-margin-bottom: 10px;");
 
-        // Styling for captionLabel
         captionLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #555555; -fx-margin-bottom: 20px;");
 
-        // Styling for formGrid
         formGrid.setStyle("-fx-background-color: #f9f9f9; -fx-border-radius: 8px; -fx-padding: 15px;");
         formGrid.setVgap(15);
         formGrid.setHgap(10);
 
-        // Styling for usernameField and passwordField
         usernameField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
         passwordField.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 4px; -fx-padding: 8px; -fx-font-size: 14px;");
-        
-        // Styling for usernameLabel and passwordLabel
+
         usernameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
         passwordLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
-        
-        // Styling for buttonGrid
+
         buttonGrid.setStyle("-fx-background-color: #f9f9f9; -fx-border-radius: 8px;");
         buttonGrid.setHgap(15);
         buttonGrid.setVgap(10);
-        
-        // Styling for loginButton
+
         loginButton.setStyle(
                 "-fx-background-color: #4CAF50; " +
                 "-fx-text-fill: white; " +
@@ -130,8 +126,7 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
                 "-fx-border-radius: 4px; " +
                 "-fx-padding: 10px; " +
                 "-fx-font-weight: bold;");
-        
-        // Styling for navigateToRegisterButton
+
         navigateToRegisterButton.setStyle(
                 "-fx-background-color: #2196F3; " +
                 "-fx-text-fill: white; " +
@@ -139,8 +134,7 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
                 "-fx-border-radius: 4px; " +
                 "-fx-padding: 10px; " +
                 "-fx-font-weight: bold;");
-        
-        // Hover effects for buttons
+
         loginButton.setOnMouseEntered(e -> loginButton.setStyle(
                 "-fx-background-color: #45a049; " + 
                 "-fx-text-fill: white; " + 
@@ -172,13 +166,13 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
                 "-fx-border-radius: 4px; " + 
                 "-fx-padding: 10px; " + 
                 "-fx-font-weight: bold;"));
-        
-        // Additional background and layout styling for VBox
+
         setStyle("-fx-background-color: #eeeeee; -fx-padding: 25px; -fx-alignment: center;");
         setSpacing(20);
     }
 
     // Helpers
+
     private void login() {
         String loginUsername = usernameField.getText();
         String loginPassword = passwordField.getText();
@@ -197,6 +191,7 @@ public class LoginView extends VBox implements EventHandler<ActionEvent> {
     }
 
     // Overrides
+
     @Override
     public void handle(ActionEvent evt)
     {

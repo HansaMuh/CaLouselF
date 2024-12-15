@@ -20,6 +20,12 @@ import views.seller.SellerItemsView;
 
 import java.util.ArrayList;
 
+/*
+    SellerHomeSubview is used to display the home view for sellers.
+    This displays a table of items that is still available for sale.
+    Sellers can also view offers made by buyers and view their own items.
+    It's the first view that sellers see when they log in.
+ */
 public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
@@ -99,12 +105,10 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
     }
 
     private void setStyling() {
-        // Styling untuk layout utama
         setStyle("-fx-background-color: #f4f7fc; -fx-padding: 20px; -fx-spacing: 15px;");
 
-        // Styling tombol
         String buttonStyle =
-            "-fx-background-color: #3f51b5; " +  // Indigo color
+            "-fx-background-color: #3f51b5; " +
             "-fx-text-fill: white; " +
             "-fx-font-weight: bold; " +
             "-fx-font-size: 14px; " +
@@ -116,24 +120,21 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
         viewOffersButton.setStyle(buttonStyle);
         viewItemsButton.setStyle(buttonStyle);
 
-        // Hover efek untuk tombol
         viewOffersButton.setOnMouseEntered(e -> viewOffersButton.setStyle(buttonStyle + "-fx-background-color: #303f9f;"));
         viewOffersButton.setOnMouseExited(e -> viewOffersButton.setStyle(buttonStyle));
 
         viewItemsButton.setOnMouseEntered(e -> viewItemsButton.setStyle(buttonStyle + "-fx-background-color: #303f9f;"));
         viewItemsButton.setOnMouseExited(e -> viewItemsButton.setStyle(buttonStyle));
 
-        // Styling untuk TableView
         itemsTable.setStyle(
             "-fx-background-color: white; " +
             "-fx-border-color: #dcdcdc; " +
             "-fx-border-radius: 10px; " +
             "-fx-background-radius: 10px; " +
             "-fx-font-size: 14px; " +
-            "-fx-text-fill: #2c3e50;" // Dark text
+            "-fx-text-fill: #2c3e50;"
         );
 
-        // Menambahkan alternating row colors
         itemsTable.setRowFactory(tv -> {
             return new TableRow<Item>() {
                 @Override
@@ -150,16 +151,13 @@ public class SellerHomeSubview extends VBox implements EventHandler<ActionEvent>
             };
         });
 
-        // Styling kolom header tabel
         for (TableColumn<Item, ?> column : itemsTable.getColumns()) {
             column.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #34495e;");
         }
 
-        // Styling bottomPane
         bottomPane.setStyle("-fx-background-color: #ffffff; -fx-padding: 10px; -fx-border-color: #e0e0e0; " +
             "-fx-border-width: 1px 0 0 0; -fx-border-radius: 5px;");
     }
-
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {

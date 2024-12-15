@@ -26,6 +26,10 @@ public class WishlistController {
 
     // Methods
 
+    /*
+    This method is used to get all wishlisted items by a user.
+    It returns a Response object containing an array list of Items.
+     */
     public Response<ArrayList<Item>> getWishlistedItems(String userId) {
         ArrayList<Item> items = new ArrayList<>();
 
@@ -53,6 +57,10 @@ public class WishlistController {
         );
     }
 
+    /*
+    This method is used to create and add a new wishlist to the database.
+    It returns a Response object containing the number of rows affected.
+     */
     public Response<Integer> addWishlist(String itemId, String userId) {
         int rowsAffected = 0;
 
@@ -84,6 +92,10 @@ public class WishlistController {
         );
     }
 
+    /*
+    This method is used to remove all wishlists based on an item's ID.
+    It returns a Response object containing the number of rows affected.
+     */
     public Response<Integer> removeWishlistsByItem(String itemId) {
         int rowsAffected = 0;
 
@@ -110,6 +122,10 @@ public class WishlistController {
         );
     }
 
+    /*
+    This method is used to remove all wishlists based on a user's ID.
+    It returns a Response object containing the number of rows affected.
+     */
     public Response<Integer> removeWishlistsByUser(String itemId, String userId) {
         int rowsAffected = 0;
 
@@ -138,6 +154,10 @@ public class WishlistController {
 
     // Utilities
 
+    /*
+    This method is used to get all items from a result set.
+    It returns an array list of Items.
+     */
     public ArrayList<Item> getItemsFromResultSet(ResultSet resultSet) {
         ArrayList<Item> items = new ArrayList<>();
 
@@ -164,6 +184,11 @@ public class WishlistController {
         return items;
     }
 
+    /*
+    This method is used to get the latest wishlist from the database.
+    It works by getting the latest wishlist with the highest ID number (on a descending list).
+    It returns a Wishlist.
+     */
     public Wishlist getLatestWishlistFromDatabase() {
         Wishlist wishlist = null;
 
@@ -173,7 +198,6 @@ public class WishlistController {
             PreparedStatement statement = database.prepareStatement(query);
 
             ResultSet resultSet = statement.executeQuery();
-
             if (resultSet.next()) {
                 wishlist = new Wishlist(
                         resultSet.getString("id"),

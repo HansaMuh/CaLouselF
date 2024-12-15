@@ -22,6 +22,10 @@ import view_controllers.MainViewController;
 
 import java.util.ArrayList;
 
+/*
+    SellerItemsView is used to display a list of items uploaded by the current seller.
+    The seller can upload, edit or delete items from this view.
+ */
 public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
 
     // Constructor
@@ -120,25 +124,21 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
     }
 
     private void setStyling() {
-        // Main VBox styling
         setStyle("-fx-background-color: #f9f9f9; -fx-padding: 20px; -fx-spacing: 15px;");
 
-        // Title Label styling
         titleLabel.setStyle(
             "-fx-font-size: 24px; " +
             "-fx-font-weight: bold; " +
-            "-fx-text-fill: #34495e; " +  // Dark text color for the title
+            "-fx-text-fill: #34495e; " +
             "-fx-padding: 10px 0;"
         );
 
-        // Caption Label styling
         captionLabel.setStyle(
             "-fx-font-size: 14px; " +
-            "-fx-text-fill: #7f8c8d; " +  // Subtle gray for caption text
+            "-fx-text-fill: #7f8c8d; " +
             "-fx-padding: 5px 0;"
         );
 
-        // TableView styling
         sellerItemsTable.setStyle(
             "-fx-background-color: white; " +
             "-fx-border-color: #bdc3c7; " +
@@ -149,12 +149,10 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
             "-fx-text-fill: #2c3e50;"
         );
 
-        // Table Column Header styling
         for (TableColumn<Item, ?> column : sellerItemsTable.getColumns()) {
             column.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-alignment: CENTER;");
         }
 
-        // Alternating row colors
         sellerItemsTable.setRowFactory(tv -> {
             TableRow<Item> row = new TableRow<>() {
                 @Override
@@ -172,18 +170,16 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
                 }
             };
 
-            // Hover effect for rows
             row.setOnMouseEntered(event -> row.setStyle("-fx-background-color: #ecf0f1;"));
             row.setOnMouseExited(event -> row.setStyle("-fx-background-color: white;"));
+
             return row;
         });
 
-        // Bottom pane styling
         bottomPane.setStyle("-fx-spacing: 10px;");
 
-        // Upload Button styling
         uploadButton.setStyle(
-            "-fx-background-color: #3498db; " +  // Blue color for upload button
+            "-fx-background-color: #3498db; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -192,9 +188,8 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         );
 
-        // Edit Button styling
         editButton.setStyle(
-            "-fx-background-color: #27ae60; " +  // Green color for edit button
+            "-fx-background-color: #27ae60; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -203,9 +198,8 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         );
 
-        // Delete Button styling
         deleteButton.setStyle(
-            "-fx-background-color: #e74c3c; " +  // Red color for delete button
+            "-fx-background-color: #e74c3c; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -214,9 +208,8 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         );
 
-        // Hover effects for buttons
         uploadButton.setOnMouseEntered(e -> uploadButton.setStyle(
-            "-fx-background-color: #2980b9; " +  // Darker blue for hover
+            "-fx-background-color: #2980b9; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -225,7 +218,7 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         ));
         uploadButton.setOnMouseExited(e -> uploadButton.setStyle(
-            "-fx-background-color: #3498db; " +  // Original blue
+            "-fx-background-color: #3498db; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -235,7 +228,7 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
         ));
 
         editButton.setOnMouseEntered(e -> editButton.setStyle(
-            "-fx-background-color: #229954; " +  // Darker green for hover
+            "-fx-background-color: #229954; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -244,7 +237,7 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         ));
         editButton.setOnMouseExited(e -> editButton.setStyle(
-            "-fx-background-color: #27ae60; " +  // Original green
+            "-fx-background-color: #27ae60; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -254,7 +247,7 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
         ));
 
         deleteButton.setOnMouseEntered(e -> deleteButton.setStyle(
-            "-fx-background-color: #c0392b; " +  // Darker red for hover
+            "-fx-background-color: #c0392b; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -263,7 +256,7 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         ));
         deleteButton.setOnMouseExited(e -> deleteButton.setStyle(
-            "-fx-background-color: #e74c3c; " +  // Original red
+            "-fx-background-color: #e74c3c; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -272,7 +265,6 @@ public class SellerItemsView extends VBox implements EventHandler<ActionEvent> {
             "-fx-cursor: hand;"
         ));
     }
-
 
     public void refreshTableContent(ArrayList<Item> items) {
         if (items == null) {

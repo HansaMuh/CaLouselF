@@ -7,6 +7,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import view_controllers.MainViewController;
 
+/*
+    MainView is used to represent the main view of the application.
+    It is the first view that is shown when the application is started.
+ */
 public class MainView {
 
     // Constructor
@@ -14,9 +18,9 @@ public class MainView {
     public MainView(Stage stage) {
         init();
         setLayout();
-        // TODO: setStyling(); // Uncomment kalau sudah ada metode setStyling
+        setStyling();
 
-        Scene scene = new Scene(viewBorder, 600, 600);
+        Scene scene = new Scene(viewBorder);
         stage.setScene(scene);
         stage.show();
     }
@@ -46,7 +50,11 @@ public class MainView {
     }
 
     private void setStyling() {
-        // TODO: Implement styling
+        topLevelBorder.setStyle("-fx-background-color: #00796b; -fx-padding: 10px; -fx-alignment: center-right;");
+
+        backButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;");
+        backButton.setOnMouseEntered(e -> backButton.setStyle("-fx-background-color: #1976D2; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
+        backButton.setOnMouseExited(e -> backButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
     }
 
     // Helpers

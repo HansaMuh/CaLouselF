@@ -2,6 +2,11 @@ package singleton;
 
 import java.sql.*;
 
+/*
+    Singleton class that represents a database connection.
+    It uses the Singleton pattern to ensure that only one instance of the class is created.
+    The class provides a method to prepare a statement with the given query and values.
+ */
 public class Database {
 
     // Constructor

@@ -24,6 +24,10 @@ public class UserController {
 
     // Methods
 
+    /*
+    This method is used to get a User from the database based on the given username and password.
+    If the username and password are valid, the method will return a Response object containing the User.
+     */
     public Response<User> login(String username, String password) {
         String errorMessage = validateLoginInfo(username, password);
 
@@ -78,6 +82,11 @@ public class UserController {
         );
     }
 
+    /*
+    This method is used to register and insert a new User into the database with the given information.
+    If the registration is successful, the method will return a Response object containing the number of rows affected.
+    (1+ if successful, 0 if failed)
+     */
     public Response<Integer> register(String username, String password, String phoneNumber, String address, String role) {
         String errorMessage = validateAccount(username, password, phoneNumber, address, role);
 
@@ -121,6 +130,11 @@ public class UserController {
 
     // Utilities
 
+    /*
+    This method is used to get the latest User from the database.
+    It works by querying the database to get the User with the highest ID number (on a descending list).
+    It returns the User object if found, otherwise it returns null.
+     */
     private User getLatestUserFromDatabase() {
         User user = null;
 
@@ -149,6 +163,11 @@ public class UserController {
         return user;
     }
 
+    /*
+    This method is used to get all Users from a result set.
+    It works by iterating through the result set and creating a User object for each row.
+    It returns an array list of Users.
+     */
     private ArrayList<User> getUsersFromResultSet(ResultSet resultSet) {
         ArrayList<User> users = new ArrayList<>();
 
@@ -175,6 +194,10 @@ public class UserController {
 
     // Validations
 
+    /*
+    This method is used to validate the login information on whether the username and password are empty.
+    It returns an error message if the validation fails.
+     */
     private String validateLoginInfo(String username, String password) {
         String errorMessage = "";
 
@@ -189,6 +212,10 @@ public class UserController {
         return errorMessage;
     }
 
+    /*
+    This method is used to validate the account information on whether the details are valid.
+    It returns an error message if the validation fails.
+     */
     private String validateAccount(String username, String password, String phoneNumber,
                                    String address, String role) {
         String errorMessage = "";
@@ -202,6 +229,10 @@ public class UserController {
         return errorMessage;
     }
 
+    /*
+    This method is used to validate the username on whether it is empty, less than 3 characters, or already exists.
+    It returns an error message if the validation fails.
+     */
     private String validateUsername(String username) {
         String errorMessage = "";
 
@@ -220,6 +251,11 @@ public class UserController {
         return errorMessage;
     }
 
+    /*
+    This method is used to validate the password on whether it is empty, less than 8 characters, or does not
+    contain special characters.
+    It returns an error message if the validation fails.
+     */
     private String validatePassword(String password) {
         String errorMessage = "";
 
@@ -238,6 +274,10 @@ public class UserController {
         return errorMessage;
     }
 
+    /*
+    This method is used to validate the phone number on whether it starts with +62 and is at least 10 characters long.
+    It returns an error message if the validation fails.
+     */
     private String validatePhoneNumber(String phoneNumber) {
         String errorMessage = "";
 
@@ -248,6 +288,10 @@ public class UserController {
         return errorMessage;
     }
 
+    /*
+    This method is used to validate the address on whether it is empty.
+    It returns an error message if the validation fails.
+     */
     private String validateAddress(String address) {
         String errorMessage = "";
 
@@ -258,6 +302,10 @@ public class UserController {
         return errorMessage;
     }
 
+    /*
+    This method is used to validate the role on whether it is empty.
+    It returns an error message if the validation fails.
+     */
     private String validateRole(String role) {
         String errorMessage = "";
 
@@ -268,6 +316,10 @@ public class UserController {
         return errorMessage;
     }
 
+    /*
+    This method is used to check whether the given username is unique in the database.
+    It returns true if the username doesn't exist yet, otherwise it returns false.
+     */
     private boolean isUsernameUnique(String username) {
         String query = "SELECT * FROM users WHERE username = ?;";
 
@@ -284,6 +336,10 @@ public class UserController {
         return false;
     }
 
+    /*
+    This method is used to check whether the given password contains at least one special character.
+    It returns true if the password contains a special character, otherwise it returns false.
+     */
     private boolean containsSpecialCharacter(String password) {
         String specialChars = "!@#$%^&*";
 
@@ -296,6 +352,10 @@ public class UserController {
         return false;
     }
 
+    /*
+    This method is used to check whether the given phone number is valid.
+    It returns true if the phone number starts with +62 and is at least 10 characters long, otherwise it returns false.
+     */
     private boolean isValidPhoneNumber(String phone) {
         if (!phone.startsWith("+62") || phone.length() < 10) {
             return false;
@@ -305,7 +365,7 @@ public class UserController {
 
         try {
             Long.parseLong(numberPart);
-            return numberPart.length() >= 8; // Total panjang termasuk +62: >= 10
+            return numberPart.length() >= 8;
         }
         catch (Exception ex) {
             ex.printStackTrace();

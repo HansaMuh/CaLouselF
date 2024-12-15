@@ -2,6 +2,9 @@ package models;
 
 import java.util.Date;
 
+/*
+    Wishlist class represents a wishlist of an item that a user wants to buy in the future.
+ */
 public class Wishlist {
 
     // Constructor

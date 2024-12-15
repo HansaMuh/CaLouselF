@@ -2,6 +2,9 @@ package models;
 
 import enums.ItemStatus;
 
+/*
+    Item class represents an item that is being sold by a seller.
+ */
 public class Item {
 
     // Constructor
