@@ -33,10 +33,11 @@ public class WishlistController {
     public Response<ArrayList<Item>> getWishlistedItems(String userId) {
         ArrayList<Item> items = new ArrayList<>();
 
-        String query = "SELECT i.* FROM wishlists AS w LEFT JOIN items AS i ON w.item_id = i.id WHERE w.user_id = ?;";
+        String query = "SELECT i.* FROM wishlists AS w LEFT JOIN items AS i ON w.item_id = i.id WHERE w.user_id = ? AND i.status = ?;";
+        String status = ItemStatus.APPROVED.toString();
 
         try {
-            PreparedStatement statement = database.prepareStatement(query, userId);
+            PreparedStatement statement = database.prepareStatement(query, userId, status);
 
             ResultSet resultSet = statement.executeQuery();
             items.addAll(getItemsFromResultSet(resultSet));
