@@ -55,6 +55,7 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
     private Label captionLabel;
     private TextField browseField;
     private Button browseButton;
+    private Button refreshButton;
 
     // Methods
 
@@ -91,6 +92,9 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
 
         browseButton = new Button("Browse");
         browseButton.setOnAction(this);
+
+        refreshButton = new Button("Refresh");
+        refreshButton.setOnAction(this);
     }
 
     private void setLayout() {
@@ -104,7 +108,7 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
         dashboardPane.setRight(browseBox);
 
         browseBox.setSpacing(5);
-        browseBox.getChildren().addAll(browseField, browseButton);
+        browseBox.getChildren().addAll(browseField, browseButton, refreshButton);
 
         getChildren().addAll(topLevelMenu, titleLabel, dashboardPane, currentSubview);
     }
@@ -127,14 +131,15 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
         browseButton.setOnMouseEntered(e -> browseButton.setStyle("-fx-background-color: #0277bd; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
         browseButton.setOnMouseExited(e -> browseButton.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
 
+        refreshButton.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;");
+        refreshButton.setOnMouseEntered(e -> refreshButton.setStyle("-fx-background-color: #0277bd; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
+        refreshButton.setOnMouseExited(e -> refreshButton.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
+
         dashboardPane.setStyle("-fx-background-color: #ffffff; -fx-padding: 15px; -fx-border-color: #e0e0e0; -fx-border-width: 1px;");
 
         if (currentSubview != null) {
             currentSubview.setStyle("-fx-background-color: #ffffff; -fx-padding: 20px; -fx-border-radius: 5px;");
         }
-
-        browseButton.setOnMouseEntered(e -> browseButton.setStyle("-fx-background-color: #0277bd; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
-        browseButton.setOnMouseExited(e -> browseButton.setStyle("-fx-background-color: #0288d1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 15px; -fx-border-radius: 5px;"));
     }
 
     // Helpers
@@ -199,6 +204,20 @@ public class HomeView extends VBox implements EventHandler<ActionEvent> {
 
                 case ADMIN:
                     browseRequestedItems();
+                    break;
+            }
+        }
+        else if (evt.getSource() == refreshButton) {
+            switch (currentUser.getRole()) {
+                case SELLER:
+                    ((SellerHomeSubview) currentSubview).refreshTableContent(null);
+                    break;
+                case BUYER:
+                    ((BuyerHomeSubview) currentSubview).refreshTableContent(null);
+                    break;
+
+                case ADMIN:
+                    ((AdminHomeSubview) currentSubview).refreshTableContent(null);
                     break;
             }
         }
